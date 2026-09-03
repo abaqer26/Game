@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="انقشها">
+<meta name="theme-color" content="#F6F1E7">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>انقشها</title>
+<style>
+  :root{
+    --earth:#F6F1E7; --earth-2:#FFFFFF; --stone:#CFC2AC; --sand:#1F1813; --sand-dim:#5A4B3B;
+    --t100:#A8790F; --t200:#B8680F; --t300:#C85A1A; --t400:#C24A20; --t500:#B32F2D; --t600:#8E1E2B;
+    --teamA:#0F8C86; --teamB:#C9432F;
+    --ink:#2B2118; --on-ink:#FBF7EF; --on-accent:#fff; --gold-text:#7A5608;
+    --glow:#EDDFC3; --logo1:#B8860B; --logo2:#B32F2D; --team-border:#CFC2AC;
+    --tileA:rgba(15,140,134,.16); --tileB:rgba(201,67,47,.16); --tileN:#EDE6D8;
+    --overlay:rgba(43,33,24,.5); --sel-bg:rgba(168,121,15,.14); --shadow:0 2px 8px rgba(43,33,24,.10);
+  }
+  body.dark{
+    --earth:#2A1F17; --earth-2:#3A2C21; --stone:#4B3A2D; --sand:#F1E4CC; --sand-dim:#C9B9A0;
+    --t100:#E7C77F; --t200:#E9A95A; --t300:#E0803F; --t400:#D9633A; --t500:#C7413F; --t600:#A52B3C;
+    --teamA:#4FC3B5; --teamB:#F0705F;
+    --ink:#E7C77F; --on-ink:#2A1F17; --on-accent:#2A1F17; --gold-text:#E7C77F;
+    --glow:#4b3a2d; --logo1:#F7E3AF; --logo2:#E0803F; --team-border:transparent;
+    --tileA:rgba(79,195,181,.16); --tileB:rgba(240,112,95,.16); --tileN:#2A1F17;
+    --overlay:rgba(0,0,0,.55); --sel-bg:rgba(231,199,127,.12); --shadow:none;
+  }
+  .theme{position:sticky;top:8px;z-index:20;width:38px;height:38px;border-radius:50%;background:var(--earth-2);margin:8px 0 0 auto;
+         border:2px solid var(--stone);font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+  body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .topbar{max-width:520px;width:100%;margin:0 auto;padding:0 16px;display:flex;justify-content:flex-end}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{background:var(--earth);color-scheme:light;min-height:100%}
+  html:has(body.dark){background:#2A1F17;color-scheme:dark}
+  body{background-color:var(--earth)!important;color:var(--sand)!important}
+  body{font-family:'Cairo','Tajawal','Noto Naskh Arabic','Geeza Pro',system-ui,-apple-system,sans-serif;background:var(--earth);color:var(--sand);
+       background-image:radial-gradient(ellipse at 50% -10%,var(--glow) 0%,transparent 55%);
+       min-height:100dvh;display:flex;flex-direction:column;user-select:none}
+  .screen{display:none;flex:1;flex-direction:column;padding:8px 16px 28px;max-width:520px;width:100%;margin:0 auto}
+  .screen.on{display:flex}
+  button{font-family:inherit;font-weight:700;border:0;cursor:pointer;color:inherit;background:none}
+  button:focus-visible,input:focus-visible{outline:3px solid var(--t100);outline-offset:2px}
+
+  /* ===== شاشة البداية ===== */
+  .logo{text-align:center;margin:6vh 0 6vh}
+  .logo h1{font-size:64px;font-weight:900;line-height:1;letter-spacing:-1px;
+           background:linear-gradient(180deg,var(--logo1) 0%,var(--logo2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .logo p{color:var(--sand-dim);font-size:15px;margin-top:8px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:14px;color:var(--sand-dim);margin-bottom:6px}
+  .field input::placeholder{color:var(--sand-dim);opacity:.6}
+  .field input{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--stone);background:var(--earth-2);
+               color:var(--sand);font:inherit;font-size:18px;font-weight:700}
+  .field.a input{border-color:var(--teamA)} .field.b input{border-color:var(--teamB)}
+  .primary{width:100%;padding:16px;border-radius:14px;font-size:20px;background:var(--ink);color:var(--on-ink);margin-top:8px}
+  .ghost{width:100%;padding:12px;border-radius:14px;font-size:15px;color:var(--sand-dim);margin-top:10px}
+  .ghost:hover{color:var(--sand)}
+  .hint{text-align:center;color:var(--sand-dim);font-size:13px;margin-top:22px;line-height:1.7}
+  .hint b{color:var(--t100)} .hint b.m{color:var(--t300)} .hint b.h{color:var(--t500)}
+
+  /* ===== اللعب ===== */
+  .scores{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .team{border-radius:14px;padding:10px 12px;background:var(--earth-2);border:2px solid var(--team-border);text-align:center}
+  .team .n{font-size:14px;color:var(--sand-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .team .s{font-size:36px;font-weight:900;line-height:1.1;transition:transform .2s}
+  .team.a .s{color:var(--teamA)} .team.b .s{color:var(--teamB)}
+  .team.bump .s{transform:scale(1.18)}
+  .qbar{display:flex;justify-content:space-between;align-items:center;color:var(--sand-dim);font-size:13px;margin:18px 2px 6px}
+  .hostbtn{font-size:13px;color:var(--t100);padding:6px 10px;border-radius:10px;border:1.5px solid var(--stone)}
+  .hostbtn.on{background:var(--t100);color:var(--on-accent);border-color:var(--t100)}
+  .host{display:none;background:var(--earth-2);border:1.5px dashed var(--t100);border-radius:14px;padding:10px 12px;margin-bottom:14px}
+  .host.on{display:block}
+  .host .hh{font-size:12px;color:var(--sand-dim);margin-bottom:6px}
+  .hrow{display:flex;align-items:center;gap:10px;width:100%;padding:9px 6px;border-radius:10px;font-size:16px;text-align:right}
+  .hrow:not(:last-child){border-bottom:1px solid var(--stone)}
+  .hrow .hp{font-weight:900;min-width:40px;text-align:center;border-radius:8px;padding:2px 0;font-size:14px;color:var(--on-accent)}
+  .hrow .hp.v100{background:var(--t100)} .hrow .hp.v200{background:var(--t200)} .hrow .hp.v300{background:var(--t300)}
+  .hrow .hp.v400{background:var(--t400);color:#fff} .hrow .hp.v500{background:var(--t500);color:#fff} .hrow .hp.v600{background:var(--t600);color:#fff}
+  .hrow.done{opacity:.4;text-decoration:line-through;pointer-events:none}
+  .q{font-size:22px;font-weight:900;line-height:1.4;min-height:62px;margin-bottom:16px;color:var(--sand)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tile{position:relative;height:96px;border-radius:14px;overflow:hidden;text-align:center;
+        background:var(--earth-2);border:2px solid var(--stone);transition:transform .12s}
+  .tile:active{transform:scale(.97)}
+  .tile .face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+              transition:opacity .35s,transform .35s}
+  .tile .pts{font-size:34px;font-weight:900;line-height:1}
+  .tile .lvl{font-size:12px;color:var(--sand-dim)}
+  .tile{box-shadow:var(--shadow)}
+  .v100 .pts,.lgrid .v100{color:var(--t100)} .v200 .pts,.lgrid .v200{color:var(--t200)} .v300 .pts,.lgrid .v300{color:var(--t300)}
+  .v400 .pts,.lgrid .v400{color:var(--t400)} .v500 .pts,.lgrid .v500{color:var(--t500)} .v600 .pts,.lgrid .v600{color:var(--t600)}
+  .tile .ans{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;
+             opacity:0;transform:translateY(12px);transition:opacity .35s .15s,transform .35s .15s}
+  .tile .ans .t{font-size:17px;font-weight:900;line-height:1.25}
+  .tile .ans .who{font-size:12px;margin-top:4px;color:var(--sand-dim)}
+  .tile.open{pointer-events:none;border-color:transparent}
+  .tile.open .face{opacity:0;transform:scale(.7)}
+  .tile.open .ans{opacity:1;transform:none}
+  .tile.open.byA{background:var(--tileA);box-shadow:inset 0 0 0 2px var(--teamA)}
+  .tile.open.byB{background:var(--tileB);box-shadow:inset 0 0 0 2px var(--teamB)}
+  .tile.open.byN{background:var(--tileN);opacity:.8}
+  .tile.crack::after{content:"";position:absolute;inset:0;background:
+     linear-gradient(115deg,transparent 48%,var(--sand) 49%,var(--sand) 51%,transparent 52%);animation:crack .35s ease-out both}
+  @keyframes crack{0%{opacity:0;transform:scaleY(0)}50%{opacity:.9}100%{opacity:0;transform:scaleY(1.3)}}
+  .actions{margin-top:auto;padding-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .actions .primary{grid-column:1/-1;margin:0}
+  .sec{padding:12px;border-radius:14px;font-size:15px;background:var(--earth-2);color:var(--sand-dim)}
+  .sec:disabled{opacity:.35;cursor:default}
+
+  /* ===== نافذة: منو جاوب ===== */
+  .sheet{position:fixed;inset:0;background:var(--overlay);display:none;align-items:flex-end;justify-content:center;z-index:10}
+  .sheet.on{display:flex}
+  .sheet .box{background:var(--earth-2);border-radius:22px 22px 0 0;padding:20px 18px 32px;width:100%;max-width:520px;
+              animation:up .25s ease-out}
+  @keyframes up{from{transform:translateY(40px);opacity:0}}
+  .box .big{text-align:center;margin-bottom:16px}
+  .box .big .t{font-size:24px;font-weight:900}
+  .box .big .p{font-size:16px;color:var(--sand-dim)}
+  .pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pick button{padding:16px 10px;border-radius:14px;font-size:18px;color:var(--on-accent)}
+  .pick .ta{background:var(--teamA)} .pick .tb{background:var(--teamB)}
+  .pick .tn{grid-column:1/-1;background:transparent;color:var(--sand-dim);border:2px solid var(--stone);font-size:15px;padding:12px}
+
+  /* ===== النهاية ===== */
+  .win{text-align:center;margin:auto 0}
+  .win .lbl{color:var(--sand-dim);font-size:16px}
+  .win .name{font-size:44px;font-weight:900;line-height:1.2;margin:4px 0 18px}
+  .win .name.a{color:var(--teamA)} .win .name.b{color:var(--teamB)} .win .name.d{color:var(--t100)}
+  .final{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:26px}
+
+  /* ===== إضافة سؤال ===== */
+  .addq{display:none;margin-top:16px;border-top:2px dashed var(--stone);padding-top:16px}
+  .addq.on{display:block}
+  .addq h3{font-size:17px;margin-bottom:10px}
+  .arow{display:grid;grid-template-columns:52px 1fr;gap:8px;margin-bottom:8px;align-items:center}
+  .arow span{font-weight:900;text-align:center;font-size:15px;border-radius:8px;padding:8px 0;color:var(--on-accent)}
+  .arow span.v100{background:var(--t100)} .arow span.v300{background:var(--t300)} .arow span.v500{background:var(--t500);color:#fff}
+  .arow input{padding:9px 12px;border-radius:10px;border:2px solid var(--stone);background:var(--earth);color:var(--sand);font:inherit;font-size:15px;width:100%}
+  .count{font-size:13px;color:var(--sand-dim);text-align:center;margin-top:10px}
+  /* ===== اختيار الفئات ===== */
+  .cats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+  .cat{padding:16px 10px;border-radius:14px;background:var(--earth-2);border:2px solid var(--stone);font-size:17px;font-weight:900;
+       text-align:center;line-height:1.3}
+  .cat .ic{display:block;font-size:26px;margin-bottom:4px}
+  .cat .rem{display:block;font-size:11px;font-weight:500;color:var(--sand-dim);margin-top:4px}
+  .cat.sel{border-color:var(--t100);background:var(--sel-bg);color:var(--gold-text)}
+  .cat:disabled{opacity:.35;cursor:default}
+  .subt{text-align:center;color:var(--sand-dim);font-size:15px;margin-top:10px}
+  .picked{text-align:center;font-size:15px;color:var(--t100);font-weight:700;margin-bottom:4px}
+  .primary:disabled{opacity:.35;cursor:default}
+
+  /* ===== اللوحة ===== */
+  .board{margin-top:14px}
+  .brow{margin-bottom:12px}
+  .brow .bn{font-size:15px;font-weight:900;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+  .brow .bn small{color:var(--sand-dim);font-weight:500;font-size:12px}
+  .cells{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .cell{height:46px;border-radius:10px;background:var(--earth-2);border:2px solid var(--stone);font-size:18px;font-weight:900;color:var(--gold-text)}
+  .cell.done{opacity:.35;color:var(--sand-dim);text-decoration:line-through;pointer-events:none}
+  .board-actions{margin-top:auto;padding-top:14px}
+  .tag{font-size:13px;color:var(--t100);margin-bottom:2px}
+  /* ===== المؤقّت ===== */
+  .timer{display:none!important;align-items:center;justify-content:center;gap:10px;margin:12px 0 4px}
+  .timer .ring{position:relative;width:64px;height:64px}
+  .timer svg{transform:rotate(-90deg);width:64px;height:64px}
+  .timer circle{fill:none;stroke-width:6}
+  .timer .bg{stroke:var(--stone)} .timer .fg{stroke:var(--teamA);stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .3s}
+  .timer .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900}
+  .timer .lbl{font-size:13px;color:var(--sand-dim)}
+  .timer.warn .fg{stroke:var(--t500)} .timer.warn .num{color:var(--t500)}
+  .timer.warn .ring{animation:pulse 1s infinite}
+  @keyframes pulse{50%{transform:scale(1.08)}}
+  .timeup{display:none;text-align:center;background:var(--t500);color:#fff;font-weight:900;font-size:18px;border-radius:12px;padding:10px;margin-bottom:12px}
+  .timeup.on{display:block}
+  .locked{pointer-events:none;opacity:.55}
+  /* ===== وسائل المساعدة ===== */
+  .lifes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .lgroup{display:flex;gap:5px}
+  .life{flex:1;padding:8px 2px;border-radius:10px;font-size:12px;font-weight:700;border:2px solid;background:transparent;line-height:1.2}
+  .lgroup.a .life{border-color:var(--teamA);color:var(--teamA)} .lgroup.b .life{border-color:var(--teamB);color:var(--teamB)}
+  .life:disabled{opacity:.3;text-decoration:line-through;cursor:default}
+  .lsheet .box{text-align:center}
+  .lsheet h3{font-size:20px;margin-bottom:6px}
+  .lsheet p{color:var(--sand-dim);font-size:14px;margin-bottom:14px;line-height:1.6}
+  .letter{font-size:64px;font-weight:900;line-height:1.1;color:var(--t100);margin:6px 0 4px}
+  .lgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+  .lgrid button{padding:14px 4px;border-radius:12px;font-size:22px;font-weight:900;background:var(--earth);border:2px solid var(--stone)}
+    .rules{display:none;text-align:right;background:var(--earth-2);border:2px solid var(--stone);border-radius:14px;padding:14px;margin-top:14px;font-size:14px;line-height:1.8}
+  .rules.on{display:block}
+  .rules b{display:block;font-size:15px;margin-top:8px}
+  .rules b:first-child{margin-top:0}
+  .rules .hd{font-size:16px;font-weight:900;color:var(--gold-text);margin-bottom:4px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="topbar"><button class="theme" id="themebtn" onclick="toggleTheme()" aria-label="تبديل الوضع">🌙</button></div>
+
+<!-- ===== شاشة البداية ===== -->
+<section class="screen on" id="s-start">
+  <div class="logo">
+    <h1>انقشها</h1>
+    <p>ست إجابات مدفونة… كل وحدة لها سعر</p>
+  </div>
+  <div class="field a"><label>اسم الفريق الأول</label><input id="nameA" maxlength="18" autocomplete="off"></div>
+  <div class="field b"><label>اسم الفريق الثاني</label><input id="nameB" maxlength="18" autocomplete="off"></div>
+  <button class="primary" onclick="goCats()">اختاروا الفئات</button>
+  <button class="ghost" onclick="$('rules').classList.toggle('on')">قوانين اللعبة ووسائل المساعدة</button>
+  <div class="rules" id="rules">
+    <div class="hd">طريقة اللعب</div>
+    كل سؤال فيه ٦ إجابات مدفونة بقيم ١٠٠، ٢٠٠، ٣٠٠، ٤٠٠، ٥٠٠، ٦٠٠ — الأسهل أقل نقاط والأصعب أكثر. الفريق اللي يقول الإجابة أول يأخذ نقاطها. الحكم بس يشوف الإجابات من «قائمة الحكم».
+    <div class="hd" style="margin-top:12px">وسائل المساعدة</div>
+    كل فريق عنده ٣ وسائل، وكل وسيلة تُستخدم مرة وحدة فقط طول اللعبة.
+    <b>🔤 الحرف الأول</b>
+    تختارون إجابة مدفونة ويطلع لكم حرفها الأول. ما تنفع على إجابة انكشفت. الحرف يطلع للفريقين، فاللي يجاوب أول يأخذها.
+    <b>🥷 اسرق</b>
+    تستخدمونها مباشرة بعد ما الفريق الثاني يجاوب إجابة صح، فتنتقل نقاطها لكم. تنفع على آخر إجابة بس، وبنفس السؤال، وقبل ما تنكشف إجابة جديدة.
+    <div class="hd" style="margin-top:12px">عدم تكرار الأسئلة</div>
+    كل لعبة تسحب ٦ أسئلة عشوائية من مخزون الفئة، وما تتكرر أي أسئلة لعبتوها إلا لما يخلص مخزون الفئة كامل، ويرجع يبدأ من جديد. عدد الأسئلة المتبقية يطلع على كل فئة عند الاختيار.
+    <button class="ghost" style="margin-top:6px" onclick="resetUsed()">تصفير الأسئلة المستخدمة</button>
+    <div id="resetmsg" style="font-size:13px;color:var(--gold-text)"></div>
+    <b>🔄 بدّل السؤال</b>
+    تبدلون السؤال الحالي بسؤال ثاني من نفس الفئة. تنفع بس قبل ما تنكشف أي إجابة. كل فئة فيها سؤال بديل واحد فقط — إذا استخدمه فريق، ما يقدر الثاني يبدّل بنفس الفئة.
+  </div>
+
+  <p class="hint">تختارون ٦ فئات، كل فئة فيها ٦ أسئلة، وكل سؤال ٦ إجابات مدفونة.<br>
+  من <b>100</b> للأسهل إلى <b class="h">600</b> للأصعب</p>
+</section>
+
+<!-- ===== اختيار الفئات ===== -->
+<section class="screen" id="s-cats">
+  <div class="picked" id="pickcount">اختاروا ٦ فئات</div>
+  <div class="cats" id="cats"></div>
+  <button class="primary" id="btnStart" onclick="startGame()" disabled>ابدأ اللعب</button>
+  <button class="ghost" onclick="show('s-start')">رجوع</button>
+</section>
+
+<!-- ===== اللوحة ===== -->
+<section class="screen" id="s-board">
+  <div class="scores">
+    <div class="team a" id="bA"><div class="n"></div><div class="s">0</div></div>
+    <div class="team b" id="bB"><div class="n"></div><div class="s">0</div></div>
+  </div>
+  <div class="board" id="board"></div>
+  <div class="board-actions"><button class="ghost" onclick="finish()">أنهِ اللعبة واعرض النتيجة</button></div>
+</section>
+
+<!-- ===== شاشة اللعب ===== -->
+<section class="screen" id="s-play">
+  <div class="scores">
+    <div class="team a" id="tA"><div class="n"></div><div class="s">0</div></div>
+    <div class="team b" id="tB"><div class="n"></div><div class="s">0</div></div>
+  </div>
+  <div class="lifes">
+    <div class="lgroup a">
+      <button class="life" id="lA-letter" onclick="useLetter('A')">🔤 الحرف الأول</button>
+      <button class="life" id="lA-steal" onclick="useSteal('A')">🥷 اسرق</button>
+      <button class="life" id="lA-swap" onclick="useSwap('A')">🔄 بدّل</button>
+    </div>
+    <div class="lgroup b">
+      <button class="life" id="lB-letter" onclick="useLetter('B')">🔤 الحرف الأول</button>
+      <button class="life" id="lB-steal" onclick="useSteal('B')">🥷 اسرق</button>
+      <button class="life" id="lB-swap" onclick="useSwap('B')">🔄 بدّل</button>
+    </div>
+  </div>
+  <div class="qbar"><span id="qnum"></span><button class="hostbtn" id="hostbtn" onclick="toggleHost()">👁 قائمة الحكم</button></div>
+  <div class="tag" id="qcat"></div>
+  <div class="q" id="qtext"></div>
+  <div class="timer" id="timer">
+    <div class="ring"><svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="28"/><circle class="fg" id="tfg" cx="32" cy="32" r="28"/></svg><div class="num" id="tnum">60</div></div>
+    <div class="lbl">ثانية للإجابة</div>
+  </div>
+  <div class="timeup" id="timeup">⏱ انتهى الوقت — ما فيه إجابات بعد</div>
+  <div class="host" id="host">
+    <div class="hh">للحكم بس — إذا فريق قال جواب من هذي، اضغطه</div>
+    <div id="hostlist"></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <div class="actions">
+    <button class="sec" id="btnUndo" onclick="undo()" disabled>تراجع</button>
+    <button class="sec" onclick="revealAll()">اكشف الباقي</button>
+    <button class="primary" id="btnNext" onclick="backBoard()">رجوع للوحة</button>
+  </div>
+</section>
+
+<!-- ===== شاشة النهاية ===== -->
+<section class="screen" id="s-end">
+  <div class="win">
+    <div class="lbl" id="wlbl">الفائز</div>
+    <div class="name" id="wname"></div>
+    <div class="final">
+      <div class="team a"><div class="n" id="fnA"></div><div class="s" id="fsA"></div></div>
+      <div class="team b"><div class="n" id="fnB"></div><div class="s" id="fsB"></div></div>
+    </div>
+    <button class="primary" onclick="resetGame()">جولة جديدة</button>
+  </div>
+</section>
+
+<!-- ===== نافذة منو جاوب ===== -->
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()">
+  <div class="box">
+    <div class="big"><div class="t" id="shAns"></div><div class="p" id="shPts"></div></div>
+    <div class="pick">
+      <button class="ta" id="shA" onclick="award('A')"></button>
+      <button class="tb" id="shB" onclick="award('B')"></button>
+      <button class="tn" onclick="award('N')">محد جاوبها — اكشفها بس</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet lsheet" id="lsheet" onclick="if(event.target===this)closeL()">
+  <div class="box"><h3 id="lTitle"></h3><p id="lBody"></p><div id="lContent"></div><button class="ghost" onclick="closeL()">إغلاق</button></div>
+</div>
+
+<script>
+// ===== بنك الفئات: كل فئة ٦ أسئلة، كل سؤال ٦ إجابات مرتبة من الأسهل (100) للأصعب (600) =====
+const CATS = [
+ {n:"كرة القدم العالمية",spare:["مدربون فازوا بكأس العالم",["ديدييه ديشان","ليونيل سكالوني","فيسنتي ديل بوسكي","يواكيم لوف","مارسيلو ليبي","لويس دي لا فوينتي"]],ic:"⚽",q:[
+  ["دول فازت بكأس العالم",["البرازيل","ألمانيا","إسبانيا","فرنسا","أوروغواي","إنجلترا"]],
+  ["أندية فازت بدوري أبطال أوروبا",["ريال مدريد","برشلونة","ليفربول","أياكس","نوتنغهام فورست","ستيوا بوخارست"]],
+  ["لاعبون فازوا بالكرة الذهبية",["ليونيل ميسي","كريستيانو رونالدو","لوكا مودريتش","كاكا","ماتياس زامر","جورج ويا"]],
+  ["لاعبون شاركوا في نهائي كأس العالم 2026 (إسبانيا × الأرجنتين)",["ليونيل ميسي","لامين يامال","فيران توريس","إيميليانو مارتينيز","إنزو فيرنانديز","باو كوبارسي"]],
+  ["لاعبون لعبوا لبرشلونة وريال مدريد",["لويس فيغو","رونالدو البرازيلي","صامويل إيتو","مايكل لاودروب","خافيير سافيولا","برند شوستر"]],
+  ["أكثر الهدافين في تاريخ كأس العالم",["رونالدو البرازيلي","ليونيل ميسي","ميروسلاف كلوزه","بيليه","جيرد مولر","جوست فونتين"]],
+  ["أندية لعب لها زلاتان إبراهيموفيتش",["ميلان","باريس سان جيرمان","مانشستر يونايتد","برشلونة","أياكس","مالمو"]],
+  ["منتخبات فازت بكأس أمم أوروبا (اليورو)",["إسبانيا","ألمانيا","فرنسا","إيطاليا","البرتغال","اليونان"]],
+  ["منتخبات فازت بكوبا أمريكا",["الأرجنتين","البرازيل","أوروغواي","تشيلي","كولومبيا","بيرو"]],
+  ["منتخبات فازت بكأس آسيا",["اليابان","السعودية","قطر","كوريا الجنوبية","الكويت","العراق"]],
+  ["منتخبات فازت بكأس أمم أفريقيا",["مصر","السنغال","الكاميرون","نيجيريا","ساحل العاج","الجزائر"]],
+  ["دول استضافت كأس العالم",["قطر","البرازيل","روسيا","جنوب أفريقيا","السويد","سويسرا"]],
+  ["أندية فازت بكأس العالم للأندية",["ريال مدريد","برشلونة","تشيلسي","ليفربول","كورينثيانز","إنترناسيونال"]],
+  ["لاعبون فازوا بالكرة الذهبية أكثر من مرة",["ليونيل ميسي","كريستيانو رونالدو","ميشيل بلاتيني","يوهان كرويف","ماركو فان باستن","فرانز بيكنباور"]],
+  ["أكثر الهدافين في تاريخ دوري أبطال أوروبا",["كريستيانو رونالدو","ليونيل ميسي","روبرت ليفاندوفسكي","كريم بنزيما","راؤول","رود فان نيستلروي"]],
+  ["لاعبون لعبوا لميلان وإنتر",["زلاتان إبراهيموفيتش","رونالدو البرازيلي","أندريا بيرلو","هاكان تشالهانوغلو","روبرتو باجيو","ليوناردو"]],
+  ["لاعبون عرب لعبوا في الدوري الإسباني",["أشرف حكيمي","ياسين بونو","يوسف النصيري","نبيل فقير","منير الحدادي","يوسف العربي"]],
+  ["لاعبون فازوا بكأس العالم 2018 مع فرنسا",["كيليان مبابي","أنطوان غريزمان","بول بوغبا","رافائيل فاران","هوغو لوريس","صامويل أومتيتي"]],
+  ["لاعبون فازوا بكأس العالم 2022 مع الأرجنتين",["ليونيل ميسي","أنخيل دي ماريا","إيميليانو مارتينيز","خوليان ألفاريز","إنزو فيرنانديز","أليكسيس ماك أليستر"]],
+  ["لاعبون فازوا بكأس العالم 2010 مع إسبانيا",["أندريس إنييستا","إيكر كاسياس","تشافي","كارلوس بويول","دافيد فيا","تشابي ألونسو"]],
+  ["مدربون درّبوا ريال مدريد",["زين الدين زيدان","كارلو أنشيلوتي","جوزيه مورينيو","رافائيل بينيتيز","فابيو كابيلو","مانويل بيليغريني"]],
+  ["مدربون درّبوا برشلونة",["بيب غوارديولا","تشافي","لويس إنريكي","رونالد كومان","فرانك رايكارد","لويس فان غال"]],
+  ["حراس مرمى فازوا بالقفاز الذهبي في كأس العالم",["إيميليانو مارتينيز","أوناي سيمون","مانويل نوير","تيبو كورتوا","إيكر كاسياس","جانلويجي بوفون"]],
+  ["ملاعب كرة قدم مشهورة",["كامب نو","سانتياغو برنابيو","ويمبلي","سان سيرو","ماراكانا","لا بومبونيرا"]],
+  ["أندية فازت بالدوري الإيطالي",["يوفنتوس","ميلان","إنتر","نابولي","روما","سامبدوريا"]],
+  ["أندية فازت بالدوري الإسباني",["ريال مدريد","برشلونة","أتلتيكو مدريد","فالنسيا","ديبورتيفو لاكورونيا","أتلتيك بلباو"]],
+  ["أندية فازت بالدوري الألماني",["بايرن ميونخ","بوروسيا دورتموند","باير ليفركوزن","فولفسبورغ","شتوتغارت","كايزرسلاوترن"]],
+  ["أندية فازت بالدوري الفرنسي",["باريس سان جيرمان","مارسيليا","ليون","موناكو","ليل","مونبلييه"]],
+  ["لاعبون انتقلوا للدوري السعودي",["كريستيانو رونالدو","كريم بنزيما","نيمار","نغولو كانتي","ساديو ماني","روبن نيفيز"]],
+  ["أندية لعب لها لويس سواريز",["برشلونة","ليفربول","أتلتيكو مدريد","أياكس","إنتر ميامي","ناسيونال"]],
+  ["أندية لعب لها روبرت ليفاندوفسكي",["بايرن ميونخ","برشلونة","بوروسيا دورتموند","ليخ بوزنان","زنيتش برشكوف","دلتا وارسو"]],
+  ["أندية لعب لها روبرتو كارلوس",["ريال مدريد","إنتر","فنربخشة","بالميراس","كورينثيانز","أنجي"]],
+  ["لاعبون طُردوا في نهائي كأس العالم",["زين الدين زيدان","مارسيل ديسايي","بيدرو مونزون","غوستافو ديزوتي","جون هايتينغا","إنزو فيرنانديز"]],
+  ["أكثر اللاعبين خوضاً لمباريات كأس العالم",["ليونيل ميسي","لوثار ماتيوس","ميروسلاف كلوزه","باولو مالديني","كريستيانو رونالدو","أوفه زيلر"]],
+  ["أندية فازت بالدوري الأوروبي (يوروبا ليغ)",["إشبيلية","أتلتيكو مدريد","تشيلسي","مانشستر يونايتد","أينتراخت فرانكفورت","فياريال"]]]},
+ {n:"الدوري الإنجليزي",spare:["أندية هبطت من البريميرليغ",["ليدز يونايتد","ليستر سيتي","ساوثهامبتون","بيرنلي","شيفيلد يونايتد","لوتون تاون"]],ic:"🏴",q:[
+  ["أندية فازت بلقب البريميرليغ",["مانشستر يونايتد","مانشستر سيتي","تشيلسي","آرسنال","بلاكبيرن روفرز","ليستر سيتي"]],
+  ["فازوا بالحذاء الذهبي في البريميرليغ",["إيرلينغ هالاند","محمد صلاح","هاري كين","جيمي فاردي","سون هيونغ مين","ديميتار برباتوف"]],
+  ["مدربون فازوا بالبريميرليغ",["أليكس فيرغسون","بيب غوارديولا","جوزيه مورينيو","يورغن كلوب","كلاوديو رانييري","كيني دالغليش"]],
+  ["أندية من لندن في البريميرليغ",["آرسنال","تشيلسي","توتنهام","وست هام","كريستال بالاس","برينتفورد"]],
+  ["ملاعب أندية البريميرليغ",["أولد ترافورد","أنفيلد","ملعب الاتحاد","ستامفورد بريدج","فيلا بارك","سانت جيمس بارك"]],
+  ["لاعبون عرب لعبوا في البريميرليغ",["محمد صلاح","رياض محرز","حكيم زياش","محمود تريزيغيه","ميدو","حسام غالي"]],
+  ["أندية لعب لها هاري كين",["توتنهام","بايرن ميونخ","ليستر سيتي","نورويتش سيتي","ميلوول","ليتون أورينت"]],
+  ["أندية لعب لها محمد صلاح",["ليفربول","تشيلسي","روما","فيورنتينا","بازل","المقاولون العرب"]],
+  ["فازوا بجائزة أفضل لاعب في الموسم (PFA)",["محمد صلاح","إيرلينغ هالاند","كيفن دي بروين","فيل فودين","فيرجيل فان دايك","رياض محرز"]],
+  ["مدربون درّبوا مانشستر يونايتد",["أليكس فيرغسون","جوزيه مورينيو","إريك تن هاغ","لويس فان غال","ديفيد مويز","أولي غونار سولشاير"]],
+  ["مدربون درّبوا تشيلسي",["جوزيه مورينيو","توماس توخيل","كارلو أنشيلوتي","فرانك لامبارد","أنطونيو كونتي","إنزو ماريسكا"]],
+  ["مدربون درّبوا آرسنال",["أرسين فينغر","ميكيل أرتيتا","أوناي إيمري","جورج غراهام","بروس ريوش","تيري نيل"]],
+  ["مدربون درّبوا ليفربول",["يورغن كلوب","آرني سلوت","رافائيل بينيتيز","جيرارد هولييه","بريندان رودجرز","روي هودجسون"]],
+  ["مدربون درّبوا مانشستر سيتي",["بيب غوارديولا","مانويل بيليغريني","روبرتو مانشيني","مارك هيوز","سفين غوران إريكسون","كيفن كيغان"]],
+  ["أندية فازت بكأس الاتحاد الإنجليزي",["آرسنال","مانشستر يونايتد","تشيلسي","ليفربول","ويغان أتلتيك","بورتسموث"]],
+  ["أندية فازت بكأس الرابطة الإنجليزية",["ليفربول","مانشستر سيتي","تشيلسي","نيوكاسل يونايتد","سوانزي سيتي","برمنغهام سيتي"]],
+  ["لاعبون سجلوا أكثر من 100 هدف في البريميرليغ",["آلان شيرر","هاري كين","واين روني","محمد صلاح","جيمي فاردي","روبي فاولر"]],
+  ["أكثر هدافي البريميرليغ تاريخياً",["آلان شيرر","هاري كين","واين روني","محمد صلاح","آندي كول","سيرجيو أغويرو"]],
+  ["أكثر صانعي الأهداف في تاريخ البريميرليغ",["راين غيغز","كيفن دي بروين","سيسك فابريغاس","واين روني","فرانك لامبارد","دينيس بيركامب"]],
+  ["أندية فازت بالدوري الإنجليزي قبل عصر البريميرليغ",["ليفربول","أستون فيلا","إيفرتون","ليدز يونايتد","ديربي كاونتي","هيدرسفيلد تاون"]],
+  ["ملاعب أندية إنجليزية",["الإمارات (آرسنال)","أنفيلد (ليفربول)","ملعب توتنهام هوتسبير","لندن ستاديوم (وست هام)","كرافن كوتيج (فولهام)","سيتي غراوند (نوتنغهام فورست)"]],
+  ["أندية من منطقة الميدلاندز",["أستون فيلا","ولفرهامبتون","ليستر سيتي","نوتنغهام فورست","وست بروميتش ألبيون","ستوك سيتي"]],
+  ["حراس فازوا بالقفاز الذهبي في البريميرليغ",["أليسون بيكر","إيدرسون","دافيد دي خيا","بيتر تشيك","جو هارت","دافيد رايا"]],
+  ["فازوا بجائزة أفضل لاعب شاب في الموسم (PFA)",["فيل فودين","إيرلينغ هالاند","كول بالمر","ديلي آلي","ترينت ألكسندر أرنولد","مورغان روجرز"]],
+  ["قادة رفعوا كأس البريميرليغ",["فيرجيل فان دايك","روي كين","جون تيري","فينسنت كومباني","توني آدامز","ويس مورغان"]],
+  ["أندية صعدت للبريميرليغ لأول مرة في تاريخها",["برينتفورد","برايتون","بورنموث","لوتون تاون","هيدرسفيلد تاون","سوانزي سيتي"]],
+  ["أندية لم تهبط أبداً من البريميرليغ",["مانشستر يونايتد","ليفربول","آرسنال","تشيلسي","توتنهام","إيفرتون"]],
+  ["أندية لعب لها كيفن دي بروين",["مانشستر سيتي","نابولي","تشيلسي","فولفسبورغ","فيردر بريمن","غينك"]],
+  ["أندية لعب لها ديدييه دروغبا",["تشيلسي","مارسيليا","غلطة سراي","شنغهاي شينهوا","لومان","غانغان"]],
+  ["أندية إنجليزية فازت بدوري أبطال أوروبا",["ليفربول","مانشستر يونايتد","تشيلسي","مانشستر سيتي","نوتنغهام فورست","أستون فيلا"]],
+  ["أكثر اللاعبين مشاركة في تاريخ البريميرليغ",["جيمس ميلنر","راين غيغز","غاريث باري","فرانك لامبارد","دافيد جيمس","إيميل هيسكي"]],
+  ["لاعبون آسيويون لعبوا في البريميرليغ",["سون هيونغ مين","بارك جي سونغ","كاورو ميتوما","تاكيهيرو تومياسو","هوانغ هي تشان","شينجي كاغاوا"]],
+  ["لاعبون برازيليون لعبوا في البريميرليغ",["روبرتو فيرمينو","أليسون بيكر","غابرييل جيسوس","كاسيميرو","ريتشارليسون","لوكاس مورا"]],
+  ["لاعبون فرنسيون فازوا بالبريميرليغ",["تييري هنري","إيريك كانتونا","باتريك فييرا","نغولو كانتي","روبير بيريس","لوران بلان"]],
+  ["لاعبون أفارقة مشهورون في البريميرليغ",["محمد صلاح","ديدييه دروغبا","يايا توريه","ساديو ماني","جاي جاي أوكوشا","توني ييبوا"]]]},
+ {n:"الكويت",spare:["مناطق في محافظة الأحمدي",["الفحيحيل","المنقف","الفنطاس","صباح الأحمد","الوفرة","الزور"]],ic:"🇰🇼",q:[
+  ["محافظات الكويت",["العاصمة","حولي","الفروانية","الأحمدي","الجهراء","مبارك الكبير"]],
+  ["بنوك كويتية",["بنك الكويت الوطني","بيت التمويل الكويتي","البنك التجاري الكويتي","بنك برقان","البنك الأهلي المتحد","بنك الكويت الصناعي"]],
+  ["أندية كرة قدم كويتية",["القادسية","العربي","الكويت","كاظمة","السالمية","اليرموك"]],
+  ["جزر كويتية",["فيلكا","بوبيان","وربة","كبر","عوهة","أم المرادم"]],
+  ["مناطق في محافظة حولي",["السالمية","حولي","الجابرية","بيان","مشرف","الشعب"]],
+  ["معالم وأماكن في الكويت",["أبراج الكويت","الأفنيوز","مركز الشيخ جابر الثقافي","حديقة الشهيد","بيت السدو","بيت القرين"]],
+  ["مناطق في محافظة العاصمة",["الشامية","الدسمة","القادسية","كيفان","الفيحاء","الشويخ"]],
+  ["مناطق في محافظة الفروانية",["الفروانية","خيطان","الرقعي","العارضية","جليب الشيوخ","الأندلس"]],
+  ["مناطق في محافظة الجهراء",["الجهراء","سعد العبد الله","القصر","الصليبية","العبدلي","النعيم"]],
+  ["مناطق في محافظة مبارك الكبير",["صباح السالم","القرين","العدان","القصور","المسيلة","أبو فطيرة"]],
+  ["أمراء حكموا الكويت",["الشيخ صباح الأحمد","الشيخ جابر الأحمد","الشيخ مشعل الأحمد","الشيخ نواف الأحمد","الشيخ عبد الله السالم","الشيخ مبارك الصباح"]],
+  ["رؤساء وزراء في الكويت",["الشيخ ناصر المحمد","الشيخ جابر المبارك","الشيخ صباح الخالد","الشيخ أحمد النواف","الشيخ محمد صباح السالم","الشيخ سعد العبد الله"]],
+  ["مجمعات تجارية في الكويت",["الأفنيوز","360 مول","مارينا مول","الكوت مول","الأسيمة","مجمع الحمراء"]],
+  ["شركات كويتية كبرى",["زين","الخطوط الجوية الكويتية","أجيليتي","مشاريع الكويت (كيبكو)","الصناعات الوطنية","المباني"]],
+  ["جامعات في الكويت",["جامعة الكويت","الجامعة الأمريكية في الكويت","الجامعة الأسترالية","جامعة الخليج (GUST)","الجامعة الأمريكية للشرق الأوسط (AUM)","جامعة عبد الله السالم"]],
+  ["مستشفيات حكومية في الكويت",["مبارك الكبير","الأميري","الفروانية","العدان","الجهراء","ابن سينا"]],
+  ["متاحف ومراكز ثقافية في الكويت",["متحف الكويت الوطني","المركز العلمي","مركز جابر الأحمد الثقافي","بيت السدو","مركز عبد الله السالم الثقافي","متحف طارق رجب"]],
+  ["قنوات تلفزيونية كويتية",["تلفزيون الكويت","الراي","سكوب","الوطن","ATV","الشاهد"]],
+  ["صحف كويتية",["القبس","الأنباء","الراي","الجريدة","الوطن","السياسة"]],
+  ["لاعبو كرة قدم كويتيون",["جاسم يعقوب","بدر المطوع","بشار عبد الله","فيصل الدخيل","سعد الحوطي","محبوب جمعة"]],
+  ["أندية كويتية",["النصر","الجهراء","التضامن","الفحيحيل","الساحل","الشباب"]],
+  ["ألقاب الأندية الكويتية",["الملك (القادسية)","الأخضر (العربي)","العميد (الكويت)","البرتقالي (كاظمة)","السماوي (السالمية)","العنابي (النصر)"]],
+  ["مشاريع وطنية في الكويت",["جسر جابر","مستشفى جابر","مدينة صباح الأحمد","ميناء مبارك الكبير","مدينة الحرير","مبنى الركاب الجديد (T2)"]],
+  ["تواريخ ومناسبات وطنية",["العيد الوطني (25 فبراير)","عيد التحرير (26 فبراير)","ذكرى الغزو (2 أغسطس)","الاستقلال (19 يونيو 1961)","إصدار الدستور (11 نوفمبر 1962)","الانضمام للأمم المتحدة (14 مايو 1963)"]],
+  ["شواطئ في الكويت",["شاطئ المسيلة","الشعب البحري","شاطئ الفنطاس","شاطئ البدع","الخيران","شاطئ العقيلة"]],
+  ["فنادق في الكويت",["شيراتون الكويت","فور سيزونز","جميرا شاطئ المسيلة","ريجنسي","كراون بلازا","سفير الفنطاس"]],
+  ["مطربون كويتيون",["عبد الله الرويشد","نبيل شعيل","نوال الكويتية","عبد الكريم عبد القادر","عوض دوخي","شادي الخليج"]],
+  ["شعراء كويتيون",["فهد العسكر","فايق عبد الجليل","أحمد العدواني","صقر الشبيب","خالد سعود الزيد","عبد الله الفرج"]],
+  ["مهن كويتية قديمة",["الغوص على اللؤلؤ","صيد السمك","القلافة (بناء السفن)","الطواشة (تجارة اللؤلؤ)","النوخذة","الصفارة (صناعة الأواني)"]],
+  ["أنواع السفن الكويتية القديمة",["البوم","الشوعي","البتيل","البغلة","السنبوك","الجالبوت"]],
+  ["ألعاب شعبية كويتية",["التيلة","خروف مسلسل","الصبة","عظيم ساري","الدسيس","الحالوسة"]],
+  ["حقول نفط في الكويت",["برقان","الروضتين","الصابرية","المقوع","أم قدير","الوفرة"]],
+  ["ملاعب كرة قدم في الكويت",["استاد جابر الدولي","ملعب محمد الحمد (القادسية)","ملعب ثامر (السالمية)","ملعب صباح السالم (العربي)","ملعب الكويت (الصداقة والسلام)","ملعب علي صباح السالم (النصر)"]],
+  ["مؤسسات حكومية كويتية",["مؤسسة البترول الكويتية","الهيئة العامة للاستثمار","بنك الكويت المركزي","هيئة أسواق المال","الصندوق الكويتي للتنمية","معهد الكويت للأبحاث العلمية"]],
+  ["مساجد مشهورة في الكويت",["المسجد الكبير","مسجد فاطمة","مسجد الإمام الحسين (المنصورية)","مسجد بن بحر (المباركية)","مسجد الخليفة","مسجد النقي (السالمية)"]]]},
+ {n:"الخليج والعرب",spare:["مدن سعودية",["الرياض","جدة","الدمام","الطائف","حائل","نجران"]],ic:"🕌",q:[
+  ["دول مجلس التعاون الخليجي",["الكويت","السعودية","الإمارات","قطر","البحرين","عُمان"]],
+  ["دول لها حدود مع السعودية",["الكويت","الإمارات","قطر","العراق","الأردن","اليمن"]],
+  ["عواصم عربية",["القاهرة","الرياض","الرباط","عمّان","نواكشوط","موروني"]],
+  ["منتخبات عربية شاركت في كأس العالم",["السعودية","المغرب","تونس","مصر","الكويت","العراق"]],
+  ["دول عربية عملتها الدينار",["الكويت","البحرين","الأردن","العراق","تونس","الجزائر"]],
+  ["دول عربية في قارة أفريقيا",["مصر","المغرب","السودان","تونس","جيبوتي","جزر القمر"]],
+  ["دول عربية في قارة آسيا",["السعودية","الإمارات","الأردن","لبنان","سوريا","فلسطين"]],
+  ["عملات عربية",["الدرهم (الإمارات)","الريال (السعودية)","الجنيه (مصر)","الدينار (الكويت)","الأوقية (موريتانيا)","الشلن (الصومال)"]],
+  ["إمارات دولة الإمارات",["دبي","أبوظبي","الشارقة","عجمان","رأس الخيمة","أم القيوين"]],
+  ["مدن عُمانية",["مسقط","صلالة","نزوى","صحار","صور","البريمي"]],
+  ["مدن مصرية",["القاهرة","الإسكندرية","الأقصر","أسوان","المنصورة","طنطا"]],
+  ["مدن مغربية",["الرباط","الدار البيضاء","مراكش","فاس","طنجة","أغادير"]],
+  ["مدن عراقية",["بغداد","البصرة","الموصل","النجف","كركوك","السليمانية"]],
+  ["مدن قطرية",["الدوحة","الوكرة","الخور","لوسيل","الريان","الشمال"]],
+  ["مدن بحرينية",["المنامة","المحرق","الرفاع","مدينة عيسى","مدينة حمد","سترة"]],
+  ["أنهار في الوطن العربي",["النيل","دجلة","الفرات","نهر الأردن","بردى","شط العرب"]],
+  ["جبال في الوطن العربي",["جبل طويق (السعودية)","جبل شمس (عُمان)","جبل توبقال (المغرب)","جبل الشيخ","جبل سانت كاترين (مصر)","جبل النبي شعيب (اليمن)"]],
+  ["أعلام عربية فيها اللون الأخضر",["السعودية","الكويت","الأردن","الجزائر","موريتانيا","جزر القمر"]],
+  ["دول عربية على البحر الأحمر",["مصر","السعودية","السودان","اليمن","الأردن","جيبوتي"]],
+  ["دول عربية على البحر المتوسط",["مصر","لبنان","تونس","المغرب","ليبيا","سوريا"]],
+  ["مطربون خليجيون",["محمد عبده","راشد الماجد","حسين الجسمي","عبد المجيد عبد الله","ميحد حمد","أحلام"]],
+  ["مطربون عرب",["فيروز","أم كلثوم","عمرو دياب","كاظم الساهر","وديع الصافي","محمد عبد الوهاب"]],
+  ["معالم عربية مشهورة",["الأهرامات","برج خليفة","أبراج الكويت","البتراء","متحف اللوفر أبوظبي","برج الفيصلية"]],
+  ["أندية كرة قدم خليجية",["الهلال","النصر","العين","الريان","المحرق","ظفار"]],
+  ["أندية عربية فازت بدوري أبطال أفريقيا",["الأهلي","الزمالك","الوداد","الترجي","الرجاء","وفاق سطيف"]],
+  ["منتخبات فازت بكأس الخليج",["الكويت","السعودية","العراق","قطر","عُمان","البحرين"]],
+  ["دول عربية تنتشر فيها الفرنسية",["المغرب","الجزائر","تونس","لبنان","موريتانيا","جيبوتي"]],
+  ["دول عربية نظامها ملكي أو وراثي",["السعودية","الأردن","المغرب","البحرين","عُمان","الكويت"]],
+  ["دول عربية نظامها جمهوري",["مصر","العراق","لبنان","تونس","موريتانيا","جزر القمر"]],
+  ["أكبر الدول العربية مساحة",["الجزائر","السعودية","السودان","ليبيا","موريتانيا","مصر"]],
+  ["أصغر الدول العربية مساحة",["البحرين","جزر القمر","قطر","لبنان","الكويت","فلسطين"]],
+  ["أكثر الدول العربية سكاناً",["مصر","السودان","الجزائر","العراق","المغرب","السعودية"]],
+  ["مطارات عربية كبيرة",["دبي الدولي","حمد الدولي (الدوحة)","الملك عبد العزيز (جدة)","القاهرة الدولي","محمد الخامس (الدار البيضاء)","الملكة علياء (عمّان)"]],
+  ["شركات طيران عربية غير خليجية",["مصر للطيران","الملكية الأردنية","الخطوط المغربية","طيران الشرق الأوسط","الخطوط التونسية","الخطوط الجوية العراقية"]],
+  ["بحار وخلجان تحيط بالوطن العربي",["البحر الأحمر","الخليج العربي","البحر المتوسط","بحر العرب","خليج عدن","خليج عُمان"]]]},
+ {n:"الإسلام والقرآن",spare:["أبناء وبنات النبي ﷺ",["فاطمة","القاسم","زينب","رقية","أم كلثوم","إبراهيم"]],ic:"📖",q:[
+  ["سور في القرآن بأسماء أنبياء",["يوسف","إبراهيم","نوح","محمد","هود","يونس"]],
+  ["أشهر السنة الهجرية",["محرم","رمضان","شعبان","رجب","جمادى الآخرة","ذو القعدة"]],
+  ["الصحابة العشرة المبشرون بالجنة",["أبو بكر الصديق","عمر بن الخطاب","عثمان بن عفان","علي بن أبي طالب","سعيد بن زيد","أبو عبيدة بن الجراح"]],
+  ["أطول سور القرآن",["البقرة","آل عمران","النساء","المائدة","الأنعام","الأعراف"]],
+  ["أنبياء ذُكروا في القرآن",["موسى","عيسى","إدريس","ذو الكفل","اليسع","إلياس"]],
+  ["غزوات النبي ﷺ",["بدر","أحد","الخندق","خيبر","بني المصطلق","ذات الرقاع"]],
+  ["سور بأسماء حيوانات وكائنات",["البقرة","النحل","النمل","العنكبوت","الفيل","الأنعام"]],
+  ["أسماء يوم القيامة في القرآن",["يوم الدين","يوم القيامة","يوم الحساب","الحاقة","القارعة","الطامة الكبرى"]],
+  ["أسماء النار في القرآن",["جهنم","سقر","لظى","الحطمة","السعير","الهاوية"]],
+  ["أسماء الجنة في القرآن",["الفردوس","عدن","النعيم","دار السلام","المأوى","عليون"]],
+  ["ملائكة معروفون",["جبريل","ميكائيل","إسرافيل","عزرائيل (ملك الموت)","مالك (خازن النار)","رضوان (خازن الجنة)"]],
+  ["الكتب والصحف السماوية",["القرآن","الإنجيل","التوراة","الزبور","صحف إبراهيم","صحف موسى"]],
+  ["سور مدنية",["البقرة","آل عمران","النساء","المائدة","التوبة","الحشر"]],
+  ["سور تبدأ بحروف مقطّعة",["البقرة (الم)","يس","طه","ص","ق","القلم (ن)"]],
+  ["أنبياء أُرسلوا لأقوامهم المذكورين في القرآن",["نوح","هود (عاد)","صالح (ثمود)","لوط","شعيب (مدين)","يونس (نينوى)"]],
+  ["شخصيات غير الأنبياء ذُكرت في القرآن",["مريم","فرعون","قارون","لقمان","ذو القرنين","هامان"]],
+  ["أقصر سور القرآن",["الكوثر","الإخلاص","العصر","النصر","الفلق","قريش"]],
+  ["من أسماء الله الحسنى",["الرحمن","الرحيم","الملك","القدوس","المهيمن","الجبار"]],
+  ["مساجد مشهورة في العالم الإسلامي",["المسجد الحرام","المسجد النبوي","المسجد الأقصى","مسجد قباء","المسجد الأموي","مسجد الكوفة"]],
+  ["مناسك الحج",["الإحرام","الطواف","السعي","الوقوف بعرفة","المبيت بمزدلفة","رمي الجمرات"]],
+  ["أماكن مقدسة في مكة والمدينة",["الكعبة","جبل عرفات","مزدلفة","منى","غار حراء","غار ثور"]],
+  ["أعمام النبي ﷺ",["حمزة","العباس","أبو طالب","أبو لهب","الحارث","الزبير"]],
+  ["أجداد النبي ﷺ في نسبه",["عبد المطلب","هاشم","عبد مناف","قصي","كلاب","مرة"]],
+  ["أسماء وألقاب النبي ﷺ",["محمد","أحمد","المصطفى","الأمين","الحاشر","العاقب"]],
+  ["مصارف الزكاة الثمانية",["الفقراء","المساكين","العاملون عليها","المؤلفة قلوبهم","في الرقاب","الغارمون"]],
+  ["معاملات محرّمة في الإسلام",["الربا","الميسر (القمار)","الغش","الرشوة","الاحتكار","الغرر"]],
+  ["آيات مشهورة بأسمائها",["آية الكرسي","آية النور","آية المباهلة","آية التطهير","آية الولاية","آية الدَّين"]],
+  ["علوم القرآن",["التفسير","التجويد","القراءات","أسباب النزول","الناسخ والمنسوخ","المكي والمدني"]],
+  ["قرّاء مشهورون",["عبد الباسط عبد الصمد","مشاري العفاسي","محمد صديق المنشاوي","ماهر المعيقلي","محمود خليل الحصري","محمد رفعت"]],
+  ["السور المسبّحات (تبدأ بالتسبيح)",["الحديد","الحشر","الصف","الجمعة","التغابن","الأعلى"]],
+  ["أنبياء ومعجزاتهم",["موسى (العصا)","عيسى (إحياء الموتى)","صالح (الناقة)","إبراهيم (النار برداً وسلاماً)","سليمان (تسخير الريح والجن)","داود (لين الحديد)"]],
+  ["أقوام أُهلكوا ذُكروا في القرآن",["قوم نوح","عاد","ثمود","قوم لوط","أصحاب مدين","أصحاب الرس"]],
+  ["أسماء القرآن الكريم",["القرآن","الفرقان","الكتاب","الذكر","التنزيل","النور"]],
+  ["فروع الدين (الفرائض العملية)",["الصلاة","الصوم","الحج","الزكاة","الخمس","الجهاد"]],
+  ["سور لها أسماء أخرى",["الفاتحة (أم الكتاب)","الإسراء (بني إسرائيل)","التوبة (براءة)","غافر (المؤمن)","الإنسان (الدهر)","النبأ (عمّ)"]]]},
+ {n:"جغرافيا العالم",spare:["دول في أمريكا الجنوبية",["البرازيل","الأرجنتين","كولومبيا","تشيلي","باراغواي","غيانا"]],ic:"🌍",q:[
+  ["أكبر دول العالم مساحة",["روسيا","كندا","الصين","أمريكا","البرازيل","أستراليا"]],
+  ["أطول أنهار العالم",["النيل","الأمازون","اليانغتسي","المسيسيبي","ينيسي","النهر الأصفر"]],
+  ["أكثر دول العالم سكاناً",["الهند","الصين","أمريكا","إندونيسيا","باكستان","نيجيريا"]],
+  ["دول لها حدود مع ألمانيا",["فرنسا","النمسا","بولندا","سويسرا","لوكسمبورغ","التشيك"]],
+  ["أعلى جبال العالم",["إيفرست","كي 2","كانشينجونغا","لوتسي","ماكالو","تشو أويو"]],
+  ["دول عاصمتها ليست أكبر مدنها",["أستراليا (كانبيرا)","تركيا (أنقرة)","كندا (أوتاوا)","البرازيل (برازيليا)","سويسرا (برن)","نيجيريا (أبوجا)"]],
+  ["قارات العالم",["آسيا","أفريقيا","أوروبا","أمريكا الشمالية","أوقيانوسيا (أستراليا)","أنتاركتيكا"]],
+  ["بحار مشهورة",["البحر المتوسط","البحر الأحمر","البحر الكاريبي","بحر الشمال","بحر قزوين","بحر البلطيق"]],
+  ["عواصم أوروبية",["لندن","باريس","برلين","فيينا","بودابست","ليوبليانا"]],
+  ["عواصم آسيوية",["طوكيو","بكين","نيودلهي","بانكوك","أولان باتور","طشقند"]],
+  ["عواصم أفريقية",["القاهرة","نيروبي","أديس أبابا","أكرا","كمبالا","ياموسوكرو"]],
+  ["عواصم أمريكا الجنوبية",["بوينس آيرس","برازيليا","سانتياغو","ليما","كيتو","أسونسيون"]],
+  ["دول في الاتحاد الأوروبي",["فرنسا","ألمانيا","إسبانيا","السويد","كرواتيا","مالطا"]],
+  ["دول أوروبية خارج الاتحاد الأوروبي",["بريطانيا","سويسرا","النرويج","تركيا","صربيا","أيسلندا"]],
+  ["دول لها حدود مع الصين",["روسيا","الهند","باكستان","منغوليا","كازاخستان","بوتان"]],
+  ["دول لها حدود مع فرنسا",["إسبانيا","ألمانيا","إيطاليا","بلجيكا","لوكسمبورغ","أندورا"]],
+  ["دول لها حدود مع البرازيل",["الأرجنتين","أوروغواي","كولومبيا","فنزويلا","بوليفيا","سورينام"]],
+  ["دول لها حدود مع روسيا",["الصين","أوكرانيا","فنلندا","كازاخستان","منغوليا","كوريا الشمالية"]],
+  ["دول جزرية",["اليابان","بريطانيا","إندونيسيا","سريلانكا","مدغشقر","فانواتو"]],
+  ["دول حبيسة بلا سواحل",["سويسرا","النمسا","أفغانستان","منغوليا","بوليفيا","ليسوتو"]],
+  ["صحارى العالم",["الصحراء الكبرى","الربع الخالي","غوبي","كالاهاري","أتاكاما","ناميب"]],
+  ["سلاسل جبلية",["الهيمالايا","الألب","الأنديز","روكي","الأورال","أطلس"]],
+  ["بحيرات كبيرة",["قزوين","سوبيريور","فيكتوريا","بايكال","تنجانيقا","تيتيكاكا"]],
+  ["شلالات مشهورة",["نياغارا","آنجل","فيكتوريا","إغوازو","يوسمايت","غولفوس"]],
+  ["مضائق بحرية",["هرمز","جبل طارق","البوسفور","باب المندب","ملقا","ماجلان"]],
+  ["قنوات مائية",["قناة السويس","قناة بنما","قناة كيل","قناة كورنث","القناة الكبرى (الصين)","قناة الفولغا-الدون"]],
+  ["أكبر جزر العالم",["غرينلاند","غينيا الجديدة","بورنيو","مدغشقر","بافن","سومطرة"]],
+  ["براكين مشهورة",["فيزوف","إتنا","فوجي","كراكاتوا","كيلاويا","بيناتوبو"]],
+  ["أكبر مدن العالم سكاناً",["طوكيو","دلهي","شنغهاي","ساو باولو","دكا","كينشاسا"]],
+  ["دول أمريكا الوسطى",["غواتيمالا","بنما","كوستاريكا","هندوراس","السلفادور","بليز"]],
+  ["دول الكاريبي",["كوبا","جامايكا","الدومينيكان","هايتي","ترينيداد وتوباغو","باربادوس"]],
+  ["دول جنوب شرق آسيا",["تايلاند","ماليزيا","إندونيسيا","فيتنام","لاوس","بروناي"]],
+  ["دول البلقان",["صربيا","كرواتيا","البوسنة والهرسك","ألبانيا","مقدونيا الشمالية","الجبل الأسود"]],
+  ["أنهار أوروبا",["الدانوب","الراين","السين","التايمز","الفولغا","الإلبه"]],
+  ["أعلى قمة في كل قارة",["إيفرست (آسيا)","كليمنجارو (أفريقيا)","إلبروس (أوروبا)","أكونكاغوا (أمريكا الجنوبية)","دينالي (أمريكا الشمالية)","فينسون (أنتاركتيكا)"]]]},
+ {n:"تقنية وذكاء اصطناعي",spare:["منصات تواصل اجتماعي",["إنستقرام","تيك توك","سناب شات","لينكدإن","ريديت","بنترست"]],ic:"🤖",q:[
+  ["شركات تطوّر نماذج ذكاء اصطناعي",["OpenAI","Google","Anthropic","Meta","Mistral","xAI"]],
+  ["أدوات توليد صور بالذكاء الاصطناعي",["Midjourney","DALL·E","Stable Diffusion","Adobe Firefly","Flux","Ideogram"]],
+  ["لغات برمجة",["بايثون","جافا سكريبت","C++","سويفت","Rust","Kotlin"]],
+  ["شركات أسسها أو يديرها إيلون ماسك",["تسلا","سبيس إكس","X (تويتر)","نيورالينك","The Boring Company","xAI"]],
+  ["تطبيقات ومنصات تملكها ميتا",["فيسبوك","إنستقرام","واتساب","ثريدز","ماسنجر","Meta Quest"]],
+  ["برامج من أدوبي",["فوتوشوب","بريمير برو","إليستريتور","أفتر إفكتس","أوديشن","لايت روم"]],
+  ["مساعدات ذكاء اصطناعي للمحادثة",["ChatGPT","Gemini","Claude","Copilot","Grok","Le Chat (Mistral)"]],
+  ["أدوات توليد فيديو بالذكاء الاصطناعي",["Sora","Runway","Kling","Veo","Higgsfield","Pika"]],
+  ["أدوات ذكاء اصطناعي للصوت والموسيقى",["ElevenLabs","Suno","Udio","Murf","Descript","Play.ht"]],
+  ["شركات تصنّع المعالجات والرقائق",["إنفيديا","إنتل","AMD","كوالكوم","TSMC","ARM"]],
+  ["أنظمة تشغيل",["ويندوز","macOS","أندرويد","iOS","لينكس","ChromeOS"]],
+  ["متصفحات إنترنت",["كروم","سفاري","فايرفوكس","إيدج","أوبرا","بريف"]],
+  ["منتجات أبل",["آيفون","آيباد","ماك بوك","آبل ووتش","إيربودز","فيجن برو"]],
+  ["خدمات من قوقل",["جيميل","يوتيوب","خرائط قوقل","قوقل درايف","Google Meet","Google Analytics"]],
+  ["منتجات وخدمات من مايكروسوفت",["ويندوز","أوفيس","تيمز","أزور","لينكدإن","GitHub"]],
+  ["منصات بث فيديو",["نتفلكس","يوتيوب","شاهد","ديزني+","أمازون برايم","OSN+"]],
+  ["تطبيقات توصيل ومواصلات في الكويت",["طلبات","ديليفرو","كريم","جاهز","أوبر","بلبيت"]],
+  ["لغات وتقنيات برمجة الويب",["HTML","CSS","جافا سكريبت","PHP","TypeScript","Ruby"]],
+  ["قواعد بيانات",["MySQL","PostgreSQL","MongoDB","Oracle","SQLite","Redis"]],
+  ["أدوات تصميم",["كانفا","فيغما","فوتوشوب","إليستريتور","سكيتش","أفينيتي"]],
+  ["برامج مونتاج فيديو",["كاب كت","بريمير برو","فاينل كت","دافينشي ريزولف","آيموفي","VN"]],
+  ["تطبيقات مراسلة",["واتساب","تيليغرام","ماسنجر","سيغنال","ديسكورد","وي تشات"]],
+  ["أكبر شركات التقنية في العالم",["أبل","مايكروسوفت","أمازون","ألفابت (قوقل)","ميتا","إنفيديا"]],
+  ["مؤسسو شركات تقنية",["بيل غيتس (مايكروسوفت)","ستيف جوبز (أبل)","مارك زوكربيرغ (ميتا)","جيف بيزوس (أمازون)","لاري بيج (قوقل)","جاك ما (علي بابا)"]],
+  ["شركات تقنية صينية",["هواوي","شاومي","بايت دانس (تيك توك)","علي بابا","تينسنت","DeepSeek"]],
+  ["عملات رقمية",["بيتكوين","إيثيريوم","تيثر","سولانا","ريبل (XRP)","دوج كوين"]],
+  ["مصطلحات في الذكاء الاصطناعي",["التعلم الآلي","الشبكات العصبية","النموذج اللغوي الكبير (LLM)","البرومبت","التعلم العميق","RAG"]],
+  ["أدوات ذكاء اصطناعي للإنتاجية",["Notion AI","Copilot","Gamma","Otter","Perplexity","NotebookLM"]],
+  ["خدمات تخزين وحوسبة سحابية",["AWS","Google Cloud","Azure","iCloud","Dropbox","Oracle Cloud"]],
+  ["شركات هواتف ذكية",["أبل","سامسونج","هواوي","شاومي","أوبو","ون بلس"]],
+  ["مخترعون ورواد في التقنية",["ألكسندر غراهام بيل (الهاتف)","توماس إديسون (المصباح)","تيم بيرنرز-لي (الويب)","آلان تورينغ","تشارلز باباج","آدا لوفليس"]],
+  ["شركات ألعاب فيديو",["سوني","نينتندو","مايكروسوفت (إكس بوكس)","EA","يوبيسوفت","روكستار"]],
+  ["منصات تعليم إلكتروني",["يوديمي","كورسيرا","يوتيوب","خان أكاديمي","إدراك","رواق"]],
+  ["أدوات تسويق رقمي",["Google Ads","Meta Ads Manager","Hootsuite","Mailchimp","HubSpot","Semrush"]],
+  ["مقاييس ومصطلحات السوشيال ميديا",["الوصول (Reach)","التفاعل (Engagement)","الانطباعات (Impressions)","CTR","CPM","ROAS"]]]},
+ {n:"مسلسلات وفنانين الكويت",ic:"🎭",spare:["روّاد التمثيل في الكويت",["خالد النفيسي","علي المفيدي","محمد المنصور","جاسم النبهان","إبراهيم الحربي","عبد الإمام عبد الله"]],q:[
+  ["فنانون كويتيون",["عبد الحسين عبد الرضا","طارق العلي","سعد الفرج","داود حسين","إبراهيم الصلال","خالد النفيسي"]],
+  ["فنانات كويتيات",["حياة الفهد","سعاد عبد الله","هدى حسين","إلهام الفضالة","مريم الصالح","انتصار الشراح"]],
+  ["أعمال من بطولة عبد الحسين عبد الرضا",["درب الزلق","باي باي لندن","سيف العرب","على هامان يا فرعون","الأقدار","بني صامت"]],
+  ["مسرحيات كويتية مشهورة",["باي باي لندن","سيف العرب","على هامان يا فرعون","فرسان المناصير","بني صامت","حرم سعادة الوزير"]],
+  ["مسلسلات كويتية حديثة",["ساق البامبو","ثلاث بنات","زوارة خميس","الخطايا العشر","العافور","الديرفة"]],
+  ["ممثلون كوميديون كويتيون",["طارق العلي","داود حسين","حسن البلام","عبد الرحمن العقل","حسين المهدي","أحمد إيراج"]],
+  ["ممثلون شاركوا في مسلسل درب الزلق",["عبد الحسين عبد الرضا","سعد الفرج","خالد النفيسي","غانم الصالح","علي المفيدي","مريم الصالح"]],
+  ["ممثلات كويتيات من الجيل الجديد",["شجون الهاجري","هيا الشعيبي","هند البلوشي","روان مهدي","شهد الياسين","فرح الصراف"]],
+  ["ممثلون كويتيون شباب",["خالد أمين","أحمد إيراج","بشار الشطي","حمد العماني","عبد الله الطراروة","محمد الحملي"]],
+  ["ممثلات كويتيات",["زهرة الخرجي","مرام البلوشي","هبة الدري","فاطمة الطباخ","أسمهان توفيق","باسمة حمادة"]],
+  ["ممثلون كويتيون",["غانم الصالح","أحمد الصالح","عبد العزيز المسلم","محمد جابر","أحمد جوهر","فؤاد علي"]],
+  ["فنانون كويتيون راحلون",["عبد الحسين عبد الرضا","غانم الصالح","خالد النفيسي","علي المفيدي","مريم الغضبان","عبد العزيز المسلم"]]]},
+ {n:"رياضات متنوعة",spare:["دول استضافت كأس العالم",["قطر","البرازيل","جنوب أفريقيا","كوريا الجنوبية","السويد","تشيلي"]],ic:"🏅",q:[
+  ["رياضات في الألعاب الأولمبية",["السباحة","ألعاب القوى","الجودو","التجديف","الخماسي الحديث","الكيرلنغ"]],
+  ["لاعبو تنس فازوا ببطولات كبرى (غراند سلام)",["رافاييل نادال","روجر فيدرر","نوفاك ديوكوفيتش","كارلوس ألكاراز","يانيك سينر","ستان فافرينكا"]],
+  ["دول استضافت الأولمبياد الصيفي",["فرنسا","أمريكا","اليابان","الصين","فنلندا","المكسيك"]],
+  ["فرق في دوري السلة الأمريكي NBA",["ليكرز","ووريورز","بولز","سلتكس","نغتس","بيسرز"]],
+  ["أبطال عالم في الفورمولا 1",["لويس هاميلتون","ماكس فيرستابن","مايكل شوماخر","فرناندو ألونسو","نيكو روزبرغ","جينسون باتون"]],
+  ["ملاكمون مشهورون",["محمد علي كلاي","مايك تايسون","فلويد مايويذر","ماني باكياو","جو فريزر","روكي مارسيانو"]],
+  ["رياضات جماعية",["كرة السلة","كرة الطائرة","كرة اليد","الرغبي","الكريكيت","الهوكي"]],
+  ["فنون قتالية",["الملاكمة","الكاراتيه","الجودو","التايكوندو","الجوجيتسو","المواي تاي"]],
+  ["لاعبات تنس مشهورات",["سيرينا ويليامز","ماريا شارابوفا","شتيفي غراف","إيغا شفيونتيك","نعومي أوساكا","أرينا سابالينكا"]],
+  ["لاعبو غولف مشهورون",["تايغر وودز","روري ماكلروي","جاك نيكلاوس","فيل ميكلسون","سكوتي شيفلر","جون رام"]],
+  ["نجوم NBA",["ليبرون جيمس","ستيفن كوري","مايكل جوردان","كوبي براينت","نيكولا يوكيتش","يانيس أنتيتوكونمبو"]],
+  ["فرق في دوري NBA",["ميامي هيت","ميلووكي بوكس","سان أنطونيو سبيرز","نيويورك نيكس","فينيكس سانز","أوكلاهوما سيتي ثاندر"]],
+  ["سائقو فورمولا 1 مشهورون",["لويس هاميلتون","ماكس فيرستابن","لاندو نوريس","شارل لوكلير","أوسكار بياستري","جورج راسل"]],
+  ["فرق فورمولا 1",["فيراري","ريد بول","مرسيدس","مكلارين","أستون مارتن","ويليامز"]],
+  ["حلبات فورمولا 1",["مونزا","سيلفرستون","موناكو","سبا","سوزوكا","إنترلاغوس"]],
+  ["سبّاحون أولمبيون",["مايكل فيلبس","كاتي ليديكي","إيان ثورب","مارك سبيتز","كايلب دريسل","ليون مارشان"]],
+  ["عدّاؤون مشهورون",["يوسين بولت","كارل لويس","محمد فرح","أليسون فيليكس","نواه لايلز","هشام الكروج"]],
+  ["نجوم كرة القدم الأمريكية NFL",["توم برادي","باتريك ماهومز","بيتون مانينغ","آرون رودجرز","جيري رايس","لامار جاكسون"]],
+  ["فرق في دوري NFL",["دالاس كاوبويز","نيو إنغلاند باتريوتس","كانساس سيتي تشيفز","غرين باي باكرز","بيتسبرغ ستيلرز","فيلادلفيا إيغلز"]],
+  ["رياضات شتوية",["التزلج","هوكي الجليد","التزلج الفني","الكيرلنغ","البياثلون","الزلاجات (اللوج)"]],
+  ["رياضات المحركات",["فورمولا 1","رالي داكار","موتو جي بي","ناسكار","إندي كار","رالي WRC"]],
+  ["مصارعون في WWE",["جون سينا","ذا روك","أندرتيكر","رومان رينز","ريك فلير","هالك هوغان"]],
+  ["مقاتلو UFC",["خبيب نورماغوميدوف","كونور مكغريغور","جون جونز","إسلام ماخاتشيف","أندرسون سيلفا","جورج سان بيير"]],
+  ["بطولات تنس",["ويمبلدون","رولان غاروس","أستراليا المفتوحة","أمريكا المفتوحة","نهائيات ATP","كأس ديفيس"]],
+  ["مسابقات ألعاب القوى الميدانية",["القفز العالي","الوثب الطويل","رمي الرمح","رمي القرص","القفز بالزانة","رمي المطرقة"]],
+  ["دول قوية في الكريكيت",["الهند","أستراليا","إنجلترا","باكستان","نيوزيلندا","جزر الهند الغربية"]],
+  ["أساطير كرة السلة",["مايكل جوردان","كوبي براينت","شاكيل أونيل","ماجيك جونسون","لاري بيرد","كريم عبد الجبار"]],
+  ["دول استضافت الأولمبياد الشتوي",["إيطاليا","الصين","كوريا الجنوبية","روسيا","كندا","النرويج"]],
+  ["أبطال عرب في الأولمبياد",["معتز برشم (قطر)","هشام الكروج (المغرب)","نوال المتوكل (المغرب)","أحمد أبو غوش (الأردن)","فهيد الديحاني (الكويت)","أحمد الحفناوي (تونس)"]],
+  ["رياضات المضرب",["التنس","تنس الطاولة","البادل","الريشة الطائرة","الاسكواش","البيكلبول"]],
+  ["رياضات مائية",["السباحة","الغطس","ركوب الأمواج","التجديف","كرة الماء","الكاياك"]],
+  ["رياضات الفروسية",["سباق الخيل","القفز على الحواجز","الترويض","القدرة والتحمل","البولو","سباق الهجن"]],
+  ["لاعبو شطرنج مشهورون",["ماغنوس كارلسن","غاري كاسباروف","بوبي فيشر","أناتولي كاربوف","هيكارو ناكامورا","دينغ ليرين"]],
+  ["ألعاب مشهورة في الرياضات الإلكترونية",["EA FC (فيفا)","Fortnite","League of Legends","Counter-Strike","Valorant","Dota 2"]],
+  ["أساطير التنس (سابقون)",["بيت سامبراس","أندريه أغاسي","بيورن بورغ","جون ماكنرو","رود لافر","إيفان ليندل"]]]},
+ {n:"علوم عامة",spare:["عظام في جسم الإنسان",["الجمجمة","عظم الفخذ","الترقوة","لوح الكتف","الزند","الكعبرة"]],ic:"🔬",q:[
+  ["كواكب المجموعة الشمسية",["الأرض","المريخ","زحل","المشتري","أورانوس","نبتون"]],
+  ["عناصر كيميائية غازية",["الأكسجين","الهيدروجين","النيتروجين","الهيليوم","الأرغون","الكريبتون"]],
+  ["أعضاء داخلية في جسم الإنسان",["القلب","الرئتان","الكبد","الكليتان","البنكرياس","الطحال"]],
+  ["علماء فيزياء مشهورون",["أينشتاين","نيوتن","نيلز بور","ريتشارد فاينمان","ماكسويل","بول ديراك"]],
+  ["ثدييات تعيش في البحر",["الحوت","الدلفين","الفقمة","الفظ","الأطوم","خروف البحر"]],
+  ["مصادر طاقة متجددة",["الطاقة الشمسية","طاقة الرياح","الطاقة المائية","الطاقة الحرارية الأرضية","طاقة المد والجزر","الكتلة الحيوية"]],
+  ["أجرام في المجموعة الشمسية غير الكواكب",["القمر","الشمس","بلوتو (كوكب قزم)","حزام الكويكبات","مذنب هالي","سيريس"]],
+  ["أقمار الكواكب",["القمر (الأرض)","تيتان (زحل)","يوروبا (المشتري)","فوبوس (المريخ)","غانيميد (المشتري)","إنسيلادوس (زحل)"]],
+  ["عناصر معدنية",["الحديد","الذهب","النحاس","الألمنيوم","البلاتين","التنغستن"]],
+  ["رموز العناصر الكيميائية",["H (الهيدروجين)","O (الأكسجين)","C (الكربون)","Na (الصوديوم)","K (البوتاسيوم)","Fe (الحديد)"]],
+  ["أجزاء الجهاز الهضمي",["الفم","المعدة","المريء","الأمعاء الدقيقة","الأمعاء الغليظة","البلعوم"]],
+  ["أجزاء العين",["القرنية","الحدقة (البؤبؤ)","القزحية","العدسة","الشبكية","العصب البصري"]],
+  ["مكونات الخلية",["النواة","الغشاء الخلوي","السيتوبلازم","الميتوكوندريا","الريبوسومات","جهاز غولجي"]],
+  ["فيتامينات ومصادرها",["فيتامين C (البرتقال)","فيتامين D (الشمس)","فيتامين A (الجزر)","فيتامين B12 (اللحوم)","فيتامين K (الخضار الورقية)","فيتامين E (المكسرات)"]],
+  ["أمراض معدية",["الإنفلونزا","كورونا","الحصبة","السل","الملاريا","الكوليرا"]],
+  ["علماء مشهورون",["تشارلز داروين","ماري كوري","غاليليو","لويس باستور","غريغور مندل","مايكل فاراداي"]],
+  ["اكتشافات ومكتشفوها",["الجاذبية (نيوتن)","البنسلين (فلمنغ)","النسبية (أينشتاين)","الراديوم (ماري كوري)","التطور (داروين)","بنية DNA (واتسون وكريك)"]],
+  ["ظواهر فيزيائية",["الجاذبية","الاحتكاك","الطفو","الحث الكهرومغناطيسي","الانكسار","التأثير الكهروضوئي"]],
+  ["وحدات القياس الأساسية",["المتر","الكيلوغرام","الثانية","الكلفن","الأمبير","المول"]],
+  ["أنواع الصخور",["الجرانيت","الرخام","الحجر الجيري","البازلت","الحجر الرملي","الصخر الزيتي"]],
+  ["ظواهر طبيعية",["الزلازل","البراكين","الأعاصير","تسونامي","الشفق القطبي","الكسوف"]],
+  ["أنواع الغيوم",["الركامية","الطبقية","السمحاقية","المزن الركامي","الركامية المتوسطة","السمحاقية الطبقية"]],
+  ["الكواكب بالترتيب من الشمس",["عطارد","الزهرة","الأرض","المريخ","المشتري","زحل"]],
+  ["رواد فضاء",["نيل أرمسترونغ","يوري غاغارين","باز ألدرين","سلطان بن سلمان","هزاع المنصوري","فالنتينا تيريشكوفا"]],
+  ["وكالات وشركات فضاء",["ناسا","سبيس إكس","وكالة الفضاء الأوروبية","روسكوسموس","جاكسا (اليابان)","إيسرو (الهند)"]],
+  ["مهمات ومراصد فضائية",["أبولو 11","هابل","جيمس ويب","فوياجر","بيرسفيرنس","كاسيني"]],
+  ["أنواع الطاقة",["الحركية","الكامنة","الحرارية","الكهربائية","النووية","الكيميائية"]],
+  ["أجهزة علمية",["المجهر","التلسكوب","الترمومتر","البارومتر","السيزموغراف","المطياف"]],
+  ["فروع العلوم",["الفيزياء","الكيمياء","الأحياء","الفلك","الجيولوجيا","علم الوراثة"]],
+  ["مضلعات هندسية",["المثلث","المربع","الخماسي","السداسي","الثماني","الاثنا عشري"]],
+  ["غدد في جسم الإنسان",["الدرقية","البنكرياس","الكظرية","النخامية","الصنوبرية","جارات الدرقية"]],
+  ["أجهزة جسم الإنسان",["الهضمي","التنفسي","الدوري","العصبي","اللمفاوي","الغدد الصماء"]],
+  ["كائنات دقيقة",["البكتيريا","الفيروسات","الفطريات","الطحالب","الأوليات","العتائق"]],
+  ["عناصر مشعة",["اليورانيوم","البلوتونيوم","الراديوم","الثوريوم","البولونيوم","الرادون"]],
+  ["غازات الدفيئة",["ثاني أكسيد الكربون","الميثان","بخار الماء","أكسيد النيتروز","الأوزون","مركبات الكلوروفلوروكربون"]]]},
+ {n:"الأئمة الاثنا عشر (ع)",ic:"🕋",spare:["أسماء الإمام المهدي (عج) وألقابه",["المهدي","صاحب الزمان","القائم","الحجة","بقية الله","المنتظر"]],q:[
+  ["أسماء الأئمة الاثني عشر (ع)",["الإمام علي","الإمام الحسين","الإمام الرضا","الإمام الصادق","الإمام الهادي","الإمام العسكري"]],
+  ["ألقاب الأئمة (ع)",["أمير المؤمنين (الإمام علي)","سيد الشهداء (الإمام الحسين)","زين العابدين (الإمام السجاد)","باقر العلوم (الإمام الباقر)","التقي (الإمام الجواد)","النقي (الإمام الهادي)"]],
+  ["مدن فيها مراقد الأئمة (ع)",["النجف الأشرف","كربلاء","مشهد","الكاظمية","سامراء","المدينة المنورة (البقيع)"]],
+  ["كُنى الأئمة (ع)",["أبو الحسن","أبو عبد الله","أبو محمد","أبو جعفر","أبو إبراهيم","أبو القاسم"]],
+  ["أبناء وبنات الإمام علي (ع)",["الإمام الحسن","الإمام الحسين","العباس","زينب","محمد بن الحنفية","أم كلثوم"]],
+  ["أمهات الأئمة (ع)",["فاطمة الزهراء (الحسن والحسين)","فاطمة بنت أسد (الإمام علي)","شهربانو (الإمام السجاد)","أم فروة (الإمام الصادق)","حميدة (الإمام الكاظم)","نرجس (الإمام المهدي)"]],
+  ["الأئمة من الأول إلى السادس بالترتيب",["الإمام علي","الإمام الحسن","الإمام الحسين","الإمام السجاد","الإمام الباقر","الإمام الصادق"]],
+  ["الأئمة من السابع إلى الثاني عشر بالترتيب",["الإمام الكاظم","الإمام الرضا","الإمام الجواد","الإمام الهادي","الإمام العسكري","الإمام المهدي"]],
+  ["الأئمة المدفونون في العراق",["الإمام علي (النجف)","الإمام الحسين (كربلاء)","الإمام الكاظم (الكاظمية)","الإمام الجواد (الكاظمية)","الإمام الهادي (سامراء)","الإمام العسكري (سامراء)"]],
+  ["الأسماء الأولى للأئمة (ع)",["علي (أربعة أئمة)","محمد (ثلاثة أئمة)","الحسن (إمامان)","الحسين","جعفر","موسى"]],
+  ["أئمة استُشهدوا بالسم بحسب الرواية",["الإمام الحسن","الإمام الرضا","الإمام الكاظم","الإمام الجواد","الإمام الهادي","الإمام العسكري"]],
+  ["أبناء وبنات الإمام الكاظم (ع)",["الإمام الرضا","أحمد بن موسى (شاه چراغ)","فاطمة المعصومة","إبراهيم","حمزة بن موسى","محمد العابد"]],
+  ["أبناء الإمام السجاد (ع)",["الإمام الباقر","زيد بن علي","عبد الله الباهر","الحسين الأصغر","عمر الأشرف","علي"]],
+  ["أبناء الإمام الصادق (ع)",["الإمام الكاظم","إسماعيل","عبد الله الأفطح","محمد الديباج","إسحاق","علي العريضي"]],
+  ["أبناء الإمام علي (ع) من غير فاطمة",["محمد بن الحنفية","العباس","جعفر","عثمان","عبد الله","عمر الأطرف"]],
+  ["نساء من أهل البيت (ع)",["فاطمة الزهراء","زينب","أم كلثوم","سكينة","فاطمة المعصومة","حكيمة بنت الجواد"]],
+  ["أصحاب الأئمة (ع)",["سلمان الفارسي","كميل بن زياد","زرارة بن أعين","هشام بن الحكم","جابر بن يزيد الجعفي","يونس بن عبد الرحمن"]],
+  ["خلفاء عباسيون عاصروا الأئمة",["المنصور (الصادق)","هارون الرشيد (الكاظم)","المأمون (الرضا)","المعتصم (الجواد)","المتوكل (الهادي)","المعتمد (العسكري)"]],
+  ["حكام أمويون عاصروا الأئمة",["معاوية (الحسن)","يزيد (الحسين)","عبد الملك بن مروان (السجاد)","هشام بن عبد الملك (الباقر)","الوليد بن عبد الملك","عمر بن عبد العزيز"]],
+  ["كتب ورسائل منسوبة للأئمة",["الصحيفة السجادية (السجاد)","نهج البلاغة (علي)","الرسالة الذهبية (الرضا)","رسالة الحقوق (السجاد)","مصباح الشريعة (الصادق)","تفسير الإمام العسكري"]],
+  ["خطب ووصايا منسوبة للإمام علي (ع)",["نهج البلاغة","دعاء كميل","الخطبة الشقشقية","عهد مالك الأشتر","وصيته للإمام الحسن","الخطبة الغراء"]],
+  ["ثورات ووقائع في زمن الأئمة",["واقعة كربلاء","ثورة زيد بن علي","ثورة التوابين","ثورة المختار","واقعة الحرة","واقعة فخ"]],
+  ["أحاديث مشهورة في فضل أهل البيت",["حديث الثقلين","حديث الغدير","حديث الكساء","حديث المنزلة","حديث السفينة","حديث الاثني عشر خليفة"]],
+  ["ألقاب الإمام الحسين (ع)",["سيد الشهداء","أبو الأحرار","ريحانة النبي","قتيل العبرة","أبو عبد الله","ثار الله"]],
+  ["ألقاب العباس بن علي (ع)",["أبو الفضل","قمر بني هاشم","باب الحوائج","ساقي عطاشى كربلاء","حامل اللواء","السقاء"]],
+  ["ألقاب الإمام علي (ع)",["أمير المؤمنين","أسد الله","حيدر","المرتضى","أبو تراب","يعسوب الدين"]],
+  ["ألقاب الإمام السجاد (ع)",["زين العابدين","السجاد","ذو الثفنات","سيد الساجدين","ابن الخيرتين","الزكي"]],
+  ["ألقاب الإمام الرضا (ع)",["الرضا","غريب طوس","ضامن الجنة","عالم آل محمد","ثامن الحجج","الصابر"]],
+  ["إخوة وأخوات الإمام الحسين (ع)",["الإمام الحسن","العباس","محمد بن الحنفية","زينب","أم كلثوم","عبد الله بن علي"]],
+  ["أمهات الأئمة (ع) — ٢",["نجمة (الإمام الرضا)","سبيكة (الإمام الجواد)","سمانة (الإمام الهادي)","حديث (الإمام العسكري)","فاطمة بنت الحسن (الإمام الباقر)","أم فروة (الإمام الصادق)"]],
+  ["علماء شيعة قدماء",["الشيخ المفيد","الشيخ الطوسي","الشيخ الكليني","العلامة الحلي","الشيخ الصدوق","الشريف المرتضى"]],
+  ["كتب حديث شيعية",["الكافي","بحار الأنوار","من لا يحضره الفقيه","تهذيب الأحكام","الاستبصار","وسائل الشيعة"]],
+  ["مراجع تقليد معاصرون",["السيد السيستاني","السيد الخامنئي","السيد الخوئي","السيد محمد حسين فضل الله","السيد صادق الشيرازي","الشيخ إسحاق الفياض"]],
+  ["نساء في واقعة كربلاء",["زينب","أم كلثوم","سكينة","رقية","فاطمة الكبرى","الرباب"]],
+  ["شخصيات في واقعة الطف",["الحر الرياحي","مسلم بن عقيل","هاني بن عروة","بُرير بن خضير","نافع بن هلال","عابس بن أبي شبيب"]]]},
+ {n:"أهل البيت وكربلاء",ic:"🏴",spare:["صحابة من خواص أمير المؤمنين (ع)",["سلمان الفارسي","أبو ذر الغفاري","المقداد بن الأسود","عمار بن ياسر","حجر بن عدي","ميثم التمار"]],q:[
+  ["شهداء كربلاء مع الإمام الحسين (ع)",["العباس بن علي","علي الأكبر","حبيب بن مظاهر","مسلم بن عوسجة","زهير بن القين","جون مولى أبي ذر"]],
+  ["أبناء وبنات الإمام الحسين (ع)",["علي الأكبر","الإمام السجاد (علي زين العابدين)","علي الأصغر (عبد الله الرضيع)","سكينة","فاطمة","رقية"]],
+  ["ألقاب السيدة زينب (ع)",["عقيلة بني هاشم","أم المصائب","الحوراء","ثانية الزهراء","الصديقة الصغرى","عالمة غير معلَّمة"]],
+  ["معارك شارك فيها الإمام علي (ع)",["بدر","أحد","الخندق","خيبر","الجمل","صفين"]],
+  ["زوجات النبي ﷺ",["خديجة","عائشة","حفصة","أم سلمة","زينب بنت جحش","صفية"]],
+  ["ألقاب السيدة فاطمة (ع)",["الزهراء","البتول","سيدة نساء العالمين","أم أبيها","الصديقة","المحدَّثة"]],
+  ["منازل في طريق الإمام الحسين (ع) من مكة إلى كربلاء",["مكة","كربلاء","الثعلبية","زبالة","شراف","ذو حسم"]],
+  ["أحداث أيام محرم في كربلاء",["عاشوراء (10 محرم)","تاسوعاء (9 محرم)","وصول الحسين إلى كربلاء (2 محرم)","منع الماء (7 محرم)","وصول عمر بن سعد (3 محرم)","رحيل السبايا (11 محرم)"]],
+  ["شهداء من بني هاشم في كربلاء",["العباس بن علي","علي الأكبر","القاسم بن الحسن","عبد الله بن الحسن","عون ومحمد ابنا زينب","جعفر بن عقيل"]],
+  ["قادة ورجال جيش الكوفة في كربلاء",["عمر بن سعد","شمر بن ذي الجوشن","عبيد الله بن زياد","الحصين بن نمير","حرملة بن كاهل","سنان بن أنس"]],
+  ["محطات مسير السبايا بعد كربلاء",["الكوفة","الشام (دمشق)","الموصل","حلب","بعلبك","حمص"]],
+  ["مصطلحات في إحياء عاشوراء",["المجلس الحسيني","اللطم","الموكب","الرادود","التشابيه","النعي"]],
+  ["رواديد مشهورون",["باسم الكربلائي","نزار القطري","حسين الأكرف","حمزة الزغير","عبد الزهرة الكعبي","جليل الكربلائي"]],
+  ["خطباء المنبر الحسيني",["الشيخ أحمد الوائلي","الشيخ عبد الحميد المهاجر","السيد منير الخباز","السيد محمد باقر الفالي","الشيخ جعفر الإبراهيمي","الشيخ حبيب الكاظمي"]],
+  ["ألقاب الإمام الحسن (ع)",["كريم أهل البيت","السبط الأكبر","المجتبى","الزكي","السيد","التقي"]],
+  ["أماكن في كربلاء",["الحرم الحسيني","حرم العباس","بين الحرمين","التل الزينبي","المخيم الحسيني","مقام الكف"]],
+  ["أماكن في النجف والكوفة",["حرم الإمام علي","مسجد الكوفة","مسجد السهلة","وادي السلام","مرقد مسلم بن عقيل","بيت الإمام علي في الكوفة"]],
+  ["أبناء الإمام الحسن (ع)",["القاسم","الحسن المثنى","عبد الله","زيد","أبو بكر","عمرو"]],
+  ["أحداث ما بعد عاشوراء",["سبي العيال","دخول الكوفة","مجلس ابن زياد","دخول الشام","مجلس يزيد","الرجوع إلى كربلاء يوم الأربعين"]],
+  ["آيات وسور ارتبطت بأهل البيت (ع)",["آية التطهير","آية المباهلة","آية الولاية","سورة الإنسان (هل أتى)","آية المودة","آية الإكمال"]],
+  ["أحداث في حياة النبي ﷺ وأهل بيته",["الغدير","المباهلة","حديث الكساء","زواج علي وفاطمة","يوم الدار (إنذار العشيرة)","حجة الوداع"]],
+  ["كتب المقتل الحسيني",["مقتل أبي مخنف","اللهوف (ابن طاووس)","مقتل المقرم","نفس المهموم (الشيخ عباس القمي)","مثير الأحزان (ابن نما)","مقتل الخوارزمي"]],
+  ["شعراء رثوا الإمام الحسين (ع) أو مدحوا أهل البيت",["دعبل الخزاعي","الكميت الأسدي","السيد حيدر الحلي","الشريف الرضي","السيد جعفر الحلي","الفرزدق"]],
+  ["أبناء الإمام علي (ع) الذين استُشهدوا في كربلاء",["العباس","عبد الله","جعفر","عثمان","أبو بكر بن علي","محمد الأصغر"]],
+  ["أحداث في حياة السيدة فاطمة (ع)",["ولادتها","زواجها من الإمام علي","المباهلة","قضية فدك","الخطبة الفدكية","وفاتها"]],
+  ["أحداث في حياة الإمام علي (ع)",["ولادته في الكعبة","ليلة المبيت","فتح خيبر","الغدير","صفين","ضربة ابن ملجم"]],
+  ["أماكن في الشام مرتبطة بالسبي",["المسجد الأموي","باب الساعات","الخرابة","مقام السيدة رقية","مقام السيدة زينب","مقبرة الباب الصغير"]],
+  ["بنات الإمام علي (ع)",["زينب","أم كلثوم","رقية","أم هانئ","رملة","ميمونة"]],
+  ["أكلات تُطبخ في مجالس العزاء",["الهريس","القيمة","الرز والمرق","المجبوس","البرياني","الجريش"]],
+  ["أحداث في حياة الإمام الحسن (ع)",["صلح معاوية","ولادته في 15 رمضان","توليه الخلافة","استشهاده بالسم","دفنه في البقيع","مشاركته في الجمل"]],
+  ["أحداث في حياة الإمام السجاد (ع)",["كربلاء","خطبته في الشام","الصحيفة السجادية","رسالة الحقوق","واقعة الحرة","استشهاده بالسم"]],
+  ["أحداث في حياة الإمام الحسين (ع)",["كربلاء","خروجه من المدينة","رسائل أهل الكوفة","خطبته يوم عاشوراء","صلح أخيه الحسن","مشاركته في صفين"]],
+  ["أشكال العزاء الحسيني الشعبي",["النعي","اللطميات","الردّة","القصيدة الفصحى","الموال","الأبوذية"]],
+  ["زوجات الإمام علي (ع)",["فاطمة الزهراء","أم البنين","خولة الحنفية","أسماء بنت عميس","ليلى النهشلية","أمامة بنت أبي العاص"]],
+  ["أصحاب الإمام الحسين (ع) — ٢",["وهب الكلبي","سعيد بن عبد الله الحنفي","أنس بن الحارث","حنظلة الشبامي","يزيد بن ثبيط","عمرو بن جنادة"]]]},
+ {n:"الأدعية والمناجاة",ic:"🤲",spare:["أدعية وأحراز منسوبة لأمير المؤمنين (ع)",["دعاء كميل","مناجاة أمير المؤمنين (مسجد الكوفة)","دعاء الصباح","دعاء المشلول","دعاء يستشير","حرز أمير المؤمنين"]],q:[
+  ["أدعية مشهورة",["دعاء كميل","دعاء التوسل","دعاء الندبة","دعاء أبي حمزة الثمالي","دعاء السمات","دعاء الجوشن الكبير"]],
+  ["أدعية تُقرأ في شهر رمضان",["دعاء الافتتاح","دعاء أبي حمزة الثمالي (السحر)","دعاء الجوشن الكبير (ليالي القدر)","اللهم أدخل على أهل القبور السرور","يا علي يا عظيم","دعاء الإفطار (اللهم لك صمت)"]],
+  ["أدعية مرتبطة بأيام أو مناسبات",["دعاء كميل (ليلة الجمعة)","دعاء الندبة (صباح الجمعة)","دعاء التوسل (ليلة الأربعاء)","دعاء السمات (عصر الجمعة)","دعاء العهد (كل صباح)","دعاء الإمام الحسين (يوم عرفة)"]],
+  ["من المناجاة الخمس عشرة للإمام السجاد (ع)",["مناجاة التائبين","مناجاة الشاكين","مناجاة الخائفين","مناجاة الراجين","مناجاة المفتقرين","مناجاة المعتصمين"]],
+  ["كتب أدعية وزيارات",["مفاتيح الجنان","الصحيفة السجادية","مصباح المتهجد (الشيخ الطوسي)","إقبال الأعمال (ابن طاووس)","البلد الأمين (الكفعمي)","المصباح (الكفعمي)"]],
+  ["أعمال ليلة القدر",["الغسل","صلاة ركعتين","رفع المصحف على الرأس","دعاء الجوشن الكبير","زيارة الإمام الحسين (ع)","دعاء اللهم كن لوليك"]],
+  ["من المناجاة الخمس عشرة — ٢",["مناجاة الراغبين","مناجاة الشاكرين","مناجاة المطيعين","مناجاة المريدين","مناجاة المحبين","مناجاة المتوسلين"]],
+  ["أدعية من الصحيفة السجادية",["دعاء مكارم الأخلاق","دعاؤه عند الصباح والمساء","دعاؤه لأبويه","دعاؤه في التوبة","دعاؤه عند دخول شهر رمضان","دعاؤه في طلب العافية"]],
+  ["أدعية وأعمال شهر رجب",["يا من أرجوه لكل خير","خاب الوافدون على غيرك","اللهم إني أسألك صبر الشاكرين","ليلة الرغائب","دعاء أم داود (15 رجب)","دعاء رجب عن الناحية المقدسة"]],
+  ["أدعية وأعمال شهر شعبان",["المناجاة الشعبانية","الصلوات الشعبانية","أعمال ليلة النصف","دعاء اللهم بحق ليلتنا هذه","زيارة الحسين في النصف","دعاء كميل ليلة النصف"]],
+  ["تعقيبات بعد الصلاة",["تسبيح الزهراء","آية الكرسي","التكبير ثلاثاً","الصلوات على محمد وآله","سجدة الشكر","لا إله إلا الله وحده وحده أنجز وعده"]],
+  ["أدعية عند الشدائد",["دعاء الفرج (إلهي عظم البلاء)","يا من تحل به عقد المكاره","حسبي الله ونعم الوكيل","دعاء المشلول","يا مفزعي عند كربتي","دعاء الحزين"]],
+  ["أعمال يوم عرفة",["دعاء الإمام الحسين","دعاء الإمام السجاد (الصحيفة)","التهليل مئة مرة","سورة الإخلاص مئة مرة","زيارة الحسين","الصوم"]],
+  ["أعمال يوم الجمعة",["غسل الجمعة","سورة الكهف","دعاء الندبة","دعاء السمات","الصلوات مئة مرة","زيارة الإمام الحجة"]],
+  ["أنواع الأذكار",["التسبيح","التحميد","التهليل","التكبير","الحوقلة","الاسترجاع"]],
+  ["أدعية والأئمة الذين رُويت عنهم",["دعاء كميل (الإمام علي)","دعاء أبي حمزة (الإمام السجاد)","دعاء عرفة (الإمام الحسين)","دعاء الندبة (الإمام الصادق)","الجوشن الكبير (عن النبي بواسطة السجاد)","دعاء السمات (الإمام الباقر)"]],
+  ["أعمال يوم العيد",["الغسل","صلاة العيد","زكاة الفطرة","التكبيرات","دعاء الندبة","زيارة الحسين"]],
+  ["أحراز مشهورة",["حرز الإمام الجواد","حرز أمير المؤمنين","آية الكرسي","المعوذتان","حرز أبي دجانة","حرز الإمام الهادي"]],
+  ["أذكار الصباح",["آية الكرسي","الإخلاص والمعوذتان","أعوذ بكلمات الله التامات","دعاء الصباح (الإمام علي)","دعاء العهد","أصبحت اللهم معتصماً بذمامك"]],
+  ["صلوات مستحبة",["صلاة الليل","صلاة الغفيلة","صلاة جعفر الطيار","صلاة الوحشة","صلاة الاستخارة","صلاة أول الشهر"]],
+  ["أجزاء صلاة الليل",["نافلة الليل (8 ركعات)","الشفع (ركعتان)","الوتر (ركعة)","القنوت","الاستغفار 70 مرة","العفو 300 مرة"]],
+  ["أذكار تُقال في القنوت",["لا إله إلا الله الحليم الكريم","ربنا آتنا في الدنيا حسنة","اللهم اغفر لنا وارحمنا","يا مقلب القلوب","اللهم إني أسألك برحمتك","اللهم صل على محمد وآل محمد"]],
+  ["مصطلحات في الأدعية",["المناجاة","الحرز","الورد","الختمة","الرقية","التعقيب"]],
+  ["ما يُقرأ للأموات وعند القبور",["سورة الفاتحة","سورة يس","سورة القدر","دعاء اللهم لا تعذب هذا الميت","صلاة الوحشة","سورة الملك"]],
+  ["أدعية مرتبطة بالإمام المهدي (عج)",["دعاء العهد","دعاء الندبة","دعاء الفرج (إلهي عظم البلاء)","اللهم كن لوليك","زيارة آل ياسين","دعاء الغيبة (اللهم عرفني نفسك)"]],
+  ["أعمال ليلة الجمعة",["دعاء كميل","زيارة الحسين","الصلوات على محمد وآله","سورة الكهف","زيارة الأئمة","دعاء السحر"]],
+  ["جمل مشهورة ومن أي دعاء",["إلهي وربي من لي غيرك (كميل)","اللهم إني أسألك برحمتك التي وسعت كل شيء (كميل)","أين الطالب بدم المقتول بكربلاء (الندبة)","إلهي لا تؤدبني بعقوبتك (أبو حمزة)","يا نور يا قدوس (الجوشن الكبير)","اللهم إني أسألك من بهائك بأبهاه (البهاء)"]],
+  ["أدعية مشهورة — ٢",["دعاء البهاء (السحر)","دعاء العهد","دعاء الفرج","دعاء المشلول","دعاء يستشير","دعاء الحزين"]],
+  ["أعمال يوم الغدير",["الغسل","الصوم","زيارة الغدير (أمين الله)","دعاء الغدير","التهنئة والمصافحة","صلاة الغدير"]],
+  ["أعمال يوم عاشوراء",["زيارة عاشوراء","إقامة العزاء","الإمساك عن الطعام حتى العصر","ترك العمل","زيارة الحسين","اللهم إن هذا يوم تبركت به بنو أمية"]],
+  ["أدعية وأعمال السفر",["دعاء السفر","آية الكرسي","اللهم أنت الصاحب في السفر","الصدقة قبل السفر","صلاة ركعتين قبل الخروج","التوديع بآية الكرسي"]],
+  ["سور تُقرأ للحفظ والرزق",["آية الكرسي","الفاتحة","الإخلاص","القدر","يس","الواقعة"]],
+  ["مصنّفو كتب الأدعية والزيارات",["الشيخ عباس القمي","السيد ابن طاووس","الشيخ الكفعمي","الشيخ الطوسي","الشيخ الصدوق","الشهيد الأول"]],
+  ["أدعية قرآنية",["ربنا آتنا في الدنيا حسنة","رب اشرح لي صدري","لا إله إلا أنت سبحانك إني كنت من الظالمين","ربنا لا تزغ قلوبنا","رب زدني علماً","ربنا أفرغ علينا صبراً"]],
+  ["صيغ الاستغفار",["أستغفر الله ربي وأتوب إليه","أستغفر الله وأتوب إليه","رب اغفر لي وارحمني","أستغفر الله الذي لا إله إلا هو الحي القيوم","العفو (300 مرة في الوتر)","اللهم اغفر لي الذنوب التي تهتك العصم (كميل)"]]]},
+ {n:"الزيارات والمراقد",ic:"🕌",spare:["المدفونون في البقيع من أهل البيت",["الإمام الحسن","الإمام السجاد","الإمام الباقر","الإمام الصادق","فاطمة بنت أسد","العباس بن عبد المطلب"]],q:[
+  ["زيارات مشهورة",["زيارة عاشوراء","زيارة الأربعين","الزيارة الجامعة الكبيرة","زيارة وارث","زيارة آل ياسين","زيارة أمين الله"]],
+  ["مدن فيها مراقد أهل البيت (ع)",["كربلاء","النجف","الكاظمية","مشهد","قم","سامراء"]],
+  ["مراقد في العراق",["الإمام علي (النجف)","الإمام الحسين (كربلاء)","الإمامان الكاظمان (الكاظمية)","الإمامان العسكريان (سامراء)","مسلم بن عقيل (الكوفة)","الحر الرياحي (كربلاء)"]],
+  ["مراقد ومقامات في الشام",["السيدة زينب","السيدة رقية","مقام رأس الحسين (المسجد الأموي)","حجر بن عدي (عدرا)","السيدة سكينة (الباب الصغير)","بلال الحبشي (الباب الصغير)"]],
+  ["مناسبات تُستحب فيها زيارة الإمام الحسين (ع)",["عاشوراء","الأربعين","ليلة القدر","يوم عرفة","النصف من شعبان","أول رجب"]],
+  ["مدن يمر بها المشاية في الأربعين",["النجف","كربلاء","البصرة","الحلة","الناصرية","السماوة"]]]},
+ {n:"مناسبات أهل البيت",ic:"🗓",spare:["مناسبات شهر ربيع الأول",["المولد النبوي (17)","ولادة الإمام الصادق (17)","استشهاد الإمام العسكري (8)","الهجرة النبوية (1)","ليلة المبيت (1)","زواج النبي من خديجة (10)"]],q:[
+  ["مناسبات شهر رمضان",["استشهاد الإمام علي (21)","ليالي القدر (19، 21، 23)","ولادة الإمام الحسن (15)","وفاة السيدة خديجة (10)","ضربة الإمام علي (19)","غزوة بدر (17)"]],
+  ["مناسبات شهر شعبان",["ولادة الإمام الحسين (3)","ولادة الإمام المهدي (15)","ولادة العباس (4)","ولادة الإمام السجاد (5)","ولادة علي الأكبر (11)","ليلة النصف من شعبان"]],
+  ["مناسبات شهر رجب",["ولادة الإمام علي (13)","المبعث النبوي (27)","ولادة الإمام الباقر (1)","استشهاد الإمام الكاظم (25)","ولادة الإمام الجواد (10)","استشهاد الإمام الهادي (3)"]],
+  ["مناسبات شهر ذي الحجة",["عيد الغدير (18)","عيد الأضحى (10)","يوم عرفة (9)","يوم المباهلة (24)","استشهاد مسلم بن عقيل (9)","ولادة الإمام الهادي (15)"]],
+  ["مناسبات شهر صفر",["الأربعين (20)","وفاة النبي ﷺ (28)","استشهاد الإمام الرضا (آخر صفر)","استشهاد الإمام الحسن (7 أو 28)","ولادة الإمام الكاظم (7)","وصول السبايا إلى الشام (1)"]],
+  ["أعياد ومناسبات فرح",["عيد الفطر","عيد الأضحى","عيد الغدير","عيد المبعث","يوم المباهلة","النصف من شعبان"]]]},
+ {n:"أكل ومطبخ",ic:"🍲",spare:["أسماك خليجية",["زبيدي","هامور","شعم","صافي","نويبي","بالول"]],q:[
+  ["أكلات كويتية وخليجية",["مجبوس","مرقوق","جريش","هريس","مطبق زبيدي","بالاليط"]],
+  ["حلويات عربية",["كنافة","بقلاوة","لقيمات","أم علي","خبيصة","عصيدة"]],
+  ["أنواع تمور",["خلاص","سكري","عجوة","مبروم","صقعي","برحي"]],
+  ["مشروبات شعبية عربية",["قهوة عربية","شاي كرك","لبن (شنينة)","قمر الدين","تمر هندي","جلاب"]],
+  ["بهارات ومنكّهات",["كركم","هيل","زعفران","قرفة","لومي أسود","حبة البركة"]],
+  ["أكلات إيطالية",["بيتزا","باستا","لازانيا","ريزوتو","نيوكي","أوسوبوكو"]]]},
+ {n:"سيارات",ic:"🚗",spare:["شركات سيارات كورية",["هيونداي","كيا","جينيسيس","سانغ يونغ","دايو","رينو سامسونغ"]],q:[
+  ["شركات سيارات يابانية",["تويوتا","نيسان","هوندا","مازدا","سوبارو","سوزوكي"]],
+  ["شركات سيارات ألمانية",["مرسيدس","بي إم دبليو","أودي","بورش","أوبل","مايباخ"]],
+  ["شركات سيارات كهربائية",["تسلا","ريفيان","لوسيد","BYD","نيو","بولستار"]],
+  ["شركات سيارات فارهة وسوبر كار",["فيراري","لامبورغيني","بوغاتي","ماكلارين","كونيغسيغ","باغاني"]],
+  ["موديلات تويوتا",["لاند كروزر","كامري","كورولا","برادو","فورتشنر","سوبرا"]],
+  ["شركات سيارات أمريكية",["فورد","شيفروليه","جيب","كاديلاك","لينكولن","دودج"]]]},
+ {n:"تاريخ",ic:"📜",spare:["عجائب الدنيا السبع القديمة",["أهرامات الجيزة","حدائق بابل المعلقة","منارة الإسكندرية","تمثال رودس","ضريح موسولوس","معبد أرتميس"]],q:[
+  ["حضارات قديمة",["الفرعونية","الرومانية","البابلية","الإغريقية","السومرية","الفينيقية"]],
+  ["دول زالت من الخريطة",["الاتحاد السوفيتي","الدولة العثمانية","يوغوسلافيا","تشيكوسلوفاكيا","بروسيا","ألمانيا الشرقية"]],
+  ["دول إسلامية تاريخية",["الأموية","العباسية","العثمانية","الفاطمية","الأندلس الأموية","المماليك"]],
+  ["حروب في القرن العشرين",["الحرب العالمية الأولى","الحرب العالمية الثانية","حرب الخليج","حرب فيتنام","الحرب الكورية","حروب البلقان"]],
+  ["علماء مسلمون",["ابن سينا","الخوارزمي","ابن الهيثم","الرازي","جابر بن حيان","البيروني"]],
+  ["قادة عسكريون في التاريخ",["الإسكندر المقدوني","نابليون","صلاح الدين الأيوبي","يوليوس قيصر","جنكيز خان","هانيبال"]]]},
+ {n:"سفر وطيران",ic:"✈️",spare:["مدن أوروبية على أنهار مشهورة",["باريس (السين)","لندن (التايمز)","فيينا (الدانوب)","روما (التيبر)","براغ (فلتافا)","بودابست (الدانوب)"]],q:[
+  ["شركات طيران خليجية",["الخطوط الكويتية","طيران الإمارات","الخطوط القطرية","الاتحاد للطيران","طيران الجزيرة","فلاي دبي"]],
+  ["وجهات سفر مشهورة عند الكويتيين",["دبي","لندن","إسطنبول","تبليسي","باكو","سراييفو"]],
+  ["مطارات مشهورة",["هيثرو (لندن)","دبي الدولي","شارل ديغول (باريس)","حمد الدولي (الدوحة)","شانغي (سنغافورة)","مطار إسطنبول"]],
+  ["شركات صناعة طائرات",["بوينغ","إيرباص","إمبراير","بومباردييه","لوكهيد مارتن","داسو"]],
+  ["عملات دول العالم",["الجنيه (بريطانيا)","اليورو","الين (اليابان)","الليرة (تركيا)","الفرنك (سويسرا)","الراند (جنوب أفريقيا)"]],
+  ["جزر سياحية",["المالديف","بالي","سانتوريني","هاواي","سيشل","موريشيوس"]]]},
+ {n:"حيوانات",ic:"🐪",spare:["حيوانات ذُكرت في القرآن",["الناقة","البقرة","الفيل","الهدهد","النمل","الحوت"]],q:[
+  ["حيوانات صحراوية",["الجمل","الضب","الغزال (الريم)","الثعلب","الوبر","الجربوع"]],
+  ["أسرع الحيوانات",["الفهد","الصقر الشاهين","النعامة","الظبي","سمك المرلين","الأرنب البري"]],
+  ["طيور جارحة",["الصقر","النسر","البومة","العقاب","الباشق","الحدأة"]],
+  ["حيوانات أفريقية",["الأسد","الفيل","الزرافة","وحيد القرن","النو","الضبع"]],
+  ["حيوانات منقرضة",["الديناصور","الماموث","طائر الدودو","النمر التسماني","النمر ذو الأسنان السيفية","الكواجا"]],
+  ["كائنات بحرية في الخليج",["القرش","الدلفين","السلحفاة الخضراء","الأطوم (بقر البحر)","قنديل البحر","حصان البحر"]]]},
+];
+// دمج السؤال البديل في مخزون الفئة
+CATS.forEach(c=>{ if(c.spare){ c.q.push(c.spare); delete c.spare; } });
+
+// ===== ذاكرة الأسئلة المستخدمة (ما تتكرر إلا لما يخلص مخزون الفئة) =====
+let USED={};
+function loadUsed(){ try{ USED=JSON.parse(localStorage.getItem('anqishha_used')||'{}'); }catch(e){ USED={}; } }
+function saveUsed(){ try{ localStorage.setItem('anqishha_used',JSON.stringify(USED)); }catch(e){} }
+function usedSet(name){ return new Set(USED[name]||[]); }
+function remaining(cat){ return cat.q.length-usedSet(cat.n).size; }
+function markUsed(name,idxs){ USED[name]=[...new Set([...(USED[name]||[]),...idxs])]; saveUsed(); }
+function resetUsed(){ USED={}; saveUsed(); if($('cats').children.length) renderCats(); $('resetmsg').textContent='تم تصفير الأسئلة — كل الفئات رجعت كاملة.'; }
+loadUsed();
+
+const PTS = [100,200,300,400,500,600];
+const LVL = {100:"سهل",200:"سهل",300:"متوسط",400:"متوسط",500:"صعب",600:"صعب"};
+
+let names={A:"",B:""}, score={A:0,B:0}, picked=[], game=[], done={}, curCat=0, curQ=0, cur=null, history=[];
+let lifes={}, swapped={};
+let tInt=null, tLeft=60; const TIME=60, CIRC=2*Math.PI*28;
+const $ = id => document.getElementById(id);
+const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+function toggleTheme(){ const d=document.body.classList.toggle('dark'); $('themebtn').textContent=d?'☀️':'🌙'; }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo(0,0); }
+
+// ===== الفئات =====
+function goCats(){
+  names.A=$('nameA').value.trim()||"الفريق الأزرق";
+  names.B=$('nameB').value.trim()||"الفريق الأحمر";
+  picked=[]; renderCats(); show('s-cats');
+}
+function renderCats(){
+  const c=$('cats'); c.innerHTML='';
+  CATS.forEach((cat,i)=>{
+    const b=document.createElement('button');
+    b.className='cat'+(picked.includes(i)?' sel':'');
+    b.disabled = picked.length>=6 && !picked.includes(i);
+    b.innerHTML=`<span class="ic">${cat.ic}</span>${cat.n}<small class="rem">${remaining(cat)} / ${cat.q.length} سؤال متبقي</small>`;
+    b.onclick=()=>{ picked.includes(i)?picked.splice(picked.indexOf(i),1):picked.push(i); renderCats(); };
+    c.appendChild(b);
+  });
+  $('pickcount').textContent = picked.length===6 ? "اخترتوا ٦ فئات ✓" : `اختاروا ${6-picked.length} ${6-picked.length===1?'فئة':'فئات'} بعد`;
+  $('btnStart').disabled = picked.length!==6;
+}
+
+// ===== اللعبة واللوحة =====
+function startGame(){
+  game=picked.map(i=>{
+    const cat=CATS[i];
+    let used=usedSet(cat.n);
+    let avail=cat.q.map((_,k)=>k).filter(k=>!used.has(k));
+    if(avail.length<7){ USED[cat.n]=[]; saveUsed(); avail=cat.q.map((_,k)=>k); }   // خلص المخزون → يبدأ من جديد
+    avail=shuffle(avail);
+    const pickIdx=avail.slice(0,6), spareIdx=avail[6];
+    markUsed(cat.n,pickIdx);
+    return {n:cat.n,ic:cat.ic,q:pickIdx.map(k=>cat.q[k]),spare:cat.q[spareIdx],spareIdx};
+  });
+  done={}; score={A:0,B:0};
+  lifes={A:{letter:1,steal:1,swap:1},B:{letter:1,steal:1,swap:1}}; swapped={};
+  $('shA').textContent=names.A; $('shB').textContent=names.B;
+  ['tA','bA'].forEach(id=>document.querySelector('#'+id+' .n').textContent=names.A);
+  ['tB','bB'].forEach(id=>document.querySelector('#'+id+' .n').textContent=names.B);
+  render(); renderBoard(); show('s-board');
+}
+function renderBoard(){
+  const b=$('board'); b.innerHTML='';
+  game.forEach((cat,ci)=>{
+    const left=6-Object.keys(done).filter(k=>k.startsWith(ci+'-')).length;
+    const row=document.createElement('div'); row.className='brow';
+    row.innerHTML=`<div class="bn"><span>${cat.ic} ${cat.n}</span><small>${left?`باقي ${left}`:'خلصت'}</small></div><div class="cells"></div>`;
+    const cells=row.querySelector('.cells');
+    cat.q.forEach((_,qi)=>{
+      const c=document.createElement('button'); c.className='cell'+(done[ci+'-'+qi]?' done':''); c.textContent=qi+1;
+      c.onclick=()=>loadQ(ci,qi); cells.appendChild(c);
+    });
+    b.appendChild(row);
+  });
+}
+function loadQ(ci,qi){
+  curCat=ci; curQ=qi;
+  const [q,ans]=game[ci].q[qi];
+  $('qcat').textContent=`${game[ci].ic} ${game[ci].n} · سؤال ${qi+1}`;
+  $('qnum').textContent=`سؤال ${qi+1} من 6`;
+  $('qtext').textContent=q;
+  const g=$('grid'); g.innerHTML='';
+  const hl=$('hostlist'); hl.innerHTML='';
+  history=[]; $('btnUndo').disabled=true;
+  [0,1,2,3,4,5].forEach(i=>{
+    const b=document.createElement('button');
+    b.className=`tile v${PTS[i]}`; b.dataset.i=i;
+    b.innerHTML=`<div class="face"><div class="pts">${PTS[i]}</div><div class="lvl">${LVL[PTS[i]]}</div></div>
+                 <div class="ans"><div class="t">${ans[i]}</div><div class="who"></div></div>`;
+    b.onclick=()=>openSheet(i,b,ans[i]);
+    g.appendChild(b);
+    const r=document.createElement('button');
+    r.className='hrow'; r.dataset.i=i;
+    r.innerHTML=`<span class="hp v${PTS[i]}">${PTS[i]}</span><span>${ans[i]}</span>`;
+    r.onclick=()=>openSheet(i,b,ans[i]);
+    hl.appendChild(r);
+  });
+  syncHost(); syncLifes(); show('s-play');
+}
+function startTimer(){
+  clearInterval(tInt); tLeft=TIME;
+  $('timeup').classList.remove('on'); $('timer').style.display='';
+  ['grid','hostlist'].forEach(id=>$(id).classList.remove('locked'));
+  document.querySelector('.lifes').classList.remove('locked');
+  $('tfg').style.strokeDasharray=CIRC; drawTimer();
+  tInt=setInterval(()=>{ tLeft--; drawTimer(); if(tLeft<=0){ clearInterval(tInt); timeUp(); } },1000);
+}
+function drawTimer(){
+  $('tnum').textContent=tLeft;
+  $('tfg').style.strokeDashoffset=CIRC*(1-tLeft/TIME);
+  $('timer').classList.toggle('warn', tLeft<=10);
+}
+function timeUp(){
+  $('timer').style.display='none'; $('timeup').classList.add('on');
+  ['grid','hostlist'].forEach(id=>$(id).classList.add('locked'));
+  document.querySelector('.lifes').classList.add('locked');
+  beep();
+}
+function beep(){
+  try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,.25,.5].forEach(t=>{ const o=a.createOscillator(), g=a.createGain(); o.frequency.value=880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.3,a.currentTime+t); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+t+.2); o.start(a.currentTime+t); o.stop(a.currentTime+t+.2); }); }catch(e){}
+}
+function syncLifes(){
+  ['A','B'].forEach(t=>['letter','steal','swap'].forEach(k=>{ $('l'+t+'-'+k).disabled=!lifes[t][k]; }));
+}
+function openL(title,body,html){ $('lTitle').textContent=title; $('lBody').textContent=body; $('lContent').innerHTML=html||''; $('lsheet').classList.add('on'); }
+function closeL(){ $('lsheet').classList.remove('on'); }
+function opp(t){ return t==='A'?'B':'A'; }
+
+// 🔤 الحرف الأول
+function useLetter(t){
+  const closed=[...document.querySelectorAll('.tile:not(.open)')];
+  if(!closed.length){ openL("ما فيه إجابات مدفونة","كل الإجابات انكشفت بهذا السؤال."); return; }
+  const html='<div class="lgrid">'+closed.map(tl=>`<button class="v${PTS[tl.dataset.i]}" onclick="showLetter('${t}',${tl.dataset.i})">${PTS[tl.dataset.i]}</button>`).join('')+'</div>';
+  openL("🔤 الحرف الأول — "+names[t],"اختاروا الإجابة اللي تبون حرفها الأول (تُستخدم مرة وحدة).",html);
+}
+function showLetter(t,i){
+  const ans=game[curCat].q[curQ][1][i].trim();
+  lifes[t].letter=0; syncLifes();
+  openL("🔤 الحرف الأول — "+names[t],`إجابة الـ${PTS[i]} تبدأ بحرف:`,`<div class="letter">${ans[0]}</div><p>${ans.length} حرف</p>`);
+}
+
+// 🥷 اسرق
+function useSteal(t){
+  const last=history[history.length-1];
+  if(!last||last.type==='steal'||last.team!==opp(t)){
+    openL("🥷 ما تقدر تسرق الحين","السرقة تنفع بس مباشرة بعد ما "+names[opp(t)]+" يجاوب إجابة صح بنفس السؤال."); return;
+  }
+  lifes[t].steal=0; syncLifes();
+  score[opp(t)]-=last.p; score[t]+=last.p;
+  last.tile.classList.remove('by'+opp(t)); last.tile.classList.add('by'+t);
+  last.tile.querySelector('.who').textContent=names[t]+" 🥷";
+  history.push({type:'steal',tile:last.tile,from:opp(t),to:t,p:last.p});
+  render(); bump(t);
+  openL("🥷 سرقة!",`${names[t]} سحب ${last.p} نقطة من ${names[opp(t)]}.`);
+}
+
+// 🔄 بدّل السؤال
+function useSwap(t){
+  if(history.length){ openL("🔄 ما تقدر تبدّل الحين","التبديل ينفع بس قبل ما تنكشف أي إجابة بهذا السؤال."); return; }
+  if(swapped[curCat]){ openL("🔄 ما فيه سؤال بديل","هذي الفئة انبدل سؤالها قبل، وكل فئة فيها بديل واحد بس."); return; }
+  lifes[t].swap=0; swapped[curCat]=true;
+  game[curCat].q[curQ]=game[curCat].spare; markUsed(game[curCat].n,[game[curCat].spareIdx]);
+  loadQ(curCat,curQ);
+  openL("🔄 انبدل السؤال",names[t]+" بدّل السؤال بسؤال ثاني من نفس الفئة.");
+}
+
+function syncHost(){
+  document.querySelectorAll('.hrow').forEach(r=>{
+    const t=document.querySelector(`.tile[data-i="${r.dataset.i}"]`);
+    r.classList.toggle('done', t.classList.contains('open'));
+  });
+}
+function toggleHost(){ $('host').classList.toggle('on'); $('hostbtn').classList.toggle('on'); }
+
+function openSheet(i,tile,text){
+  cur={i,tile};
+  $('shAns').textContent=text;
+  $('shPts').textContent=`${PTS[i]} نقطة · ${LVL[PTS[i]]}`;
+  $('sheet').classList.add('on');
+}
+function closeSheet(){ $('sheet').classList.remove('on'); cur=null; }
+function award(team){
+  const {i,tile}=cur; closeSheet();
+  const p=PTS[i];
+  tile.classList.add('open','by'+team,'crack');
+  tile.querySelector('.who').textContent = team==='N' ? "ما انقشت" : names[team];
+  if(team!=='N'){ score[team]+=p; bump(team); }
+  history.push({tile,team,p}); $('btnUndo').disabled=false;
+  syncHost(); render();
+}
+function undo(){
+  const h=history.pop(); if(!h) return;
+  if(h.type==='steal'){
+    score[h.to]-=h.p; score[h.from]+=h.p;
+    h.tile.classList.remove('by'+h.to); h.tile.classList.add('by'+h.from);
+    h.tile.querySelector('.who').textContent=names[h.from];
+    lifes[h.to].steal=1; syncLifes(); render(); $('btnUndo').disabled=!history.length; return;
+  }
+  h.tile.classList.remove('open','byA','byB','byN','crack');
+  if(h.team!=='N') score[h.team]-=h.p;
+  syncHost(); render(); $('btnUndo').disabled=!history.length;
+}
+function revealAll(){
+  document.querySelectorAll('.tile:not(.open)').forEach(t=>{ t.classList.add('open','byN','crack'); t.querySelector('.who').textContent="ما انقشت"; });
+  syncHost();
+}
+function bump(t){ const el=$('t'+t); el.classList.add('bump'); setTimeout(()=>el.classList.remove('bump'),250); }
+function render(){
+  ['tA','bA'].forEach(id=>document.querySelector('#'+id+' .s').textContent=score.A);
+  ['tB','bB'].forEach(id=>document.querySelector('#'+id+' .s').textContent=score.B);
+}
+function backBoard(){
+  clearInterval(tInt);
+  done[curCat+'-'+curQ]=true;
+  $('host').classList.remove('on'); $('hostbtn').classList.remove('on');
+  renderBoard();
+  if(Object.keys(done).length===36){ finish(); return; }
+  show('s-board');
+}
+function finish(){
+  clearInterval(tInt);
+  $('fnA').textContent=names.A; $('fnB').textContent=names.B;
+  $('fsA').textContent=score.A; $('fsB').textContent=score.B;
+  const w=$('wname');
+  if(score.A===score.B){ $('wlbl').textContent="تعادل!"; w.textContent="محد انقش أكثر من الثاني"; w.className="name d"; }
+  else { const t=score.A>score.B?'A':'B'; $('wlbl').textContent="الفائز"; w.textContent=names[t]; w.className="name "+t.toLowerCase(); }
+  show('s-end');
+}
+function resetGame(){ score={A:0,B:0}; done={}; picked=[]; render(); show('s-start'); }
+</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
+</body>
+</html>
