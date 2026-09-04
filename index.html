@@ -165,7 +165,28 @@
   .board-actions{margin-top:auto;padding-top:14px}
   .tag{font-size:13px;color:var(--t100);margin-bottom:2px}
   /* ===== المؤقّت ===== */
-  .timer{display:none!important;align-items:center;justify-content:center;gap:10px;margin:12px 0 4px}
+  .clock{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 10px;background:var(--earth-2);border:2px solid var(--stone);border-radius:14px;padding:8px 12px}
+  .clock .total{font-size:13px;color:var(--sand-dim)}
+  .clock .total b{display:block;font-size:22px;font-weight:900;color:var(--sand);font-variant-numeric:tabular-nums}
+  .clock.warn .total b{color:var(--t500)}
+  .turn{display:flex;align-items:center;gap:10px}
+  .turn .who{font-size:15px;font-weight:900;text-align:left}
+  .turn .who small{display:block;font-size:11px;font-weight:500;color:var(--sand-dim)}
+  .turn .ring{position:relative;width:56px;height:56px}
+  .turn svg{transform:rotate(-90deg);width:56px;height:56px}
+  .turn circle{fill:none;stroke-width:6}
+  .turn .bg{stroke:var(--stone)} .turn .fg{stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+  .turn .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900}
+  .clock.A .turn .fg,.clock.A .turn .num,.clock.A .who{color:var(--teamA);stroke:var(--teamA)}
+  .clock.B .turn .fg,.clock.B .turn .num,.clock.B .who{color:var(--teamB);stroke:var(--teamB)}
+  .clock .go{padding:10px 16px;border-radius:12px;background:var(--ink);color:var(--on-ink);font-size:16px}
+  .clock .pause{font-size:12px;color:var(--sand-dim);padding:4px 8px;border:1.5px solid var(--stone);border-radius:8px}
+  .team.active{border-color:var(--teamA);box-shadow:0 0 0 3px rgba(31,166,160,.25)}
+  .team.b.active{border-color:var(--teamB);box-shadow:0 0 0 3px rgba(228,85,63,.25)}
+  .team .n::after{content:" ← دوره";display:none;color:var(--sand-dim);font-size:11px}
+  .team.active .n::after{display:inline}
+  .pick button.sugg{outline:3px solid var(--t100);outline-offset:2px}
+  .timer{display:none!important}
   .timer .ring{position:relative;width:64px;height:64px}
   .timer svg{transform:rotate(-90deg);width:64px;height:64px}
   .timer circle{fill:none;stroke-width:6}
@@ -195,6 +216,38 @@
   .rules b{display:block;font-size:15px;margin-top:8px}
   .rules b:first-child{margin-top:0}
   .rules .hd{font-size:16px;font-weight:900;color:var(--gold-text);margin-bottom:4px}
+  /* ===== وضع الجهازين ===== */
+  .seg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:6px 0 14px}
+  .seg button{padding:10px 4px;border-radius:12px;border:2px solid var(--stone);font-size:13px;line-height:1.3}
+  .seg button.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+  .netbox{display:none;border:2px dashed var(--stone);border-radius:14px;padding:12px;margin-bottom:12px}
+  .netbox.on{display:block}
+  .netbox .lbl{font-size:13px;color:var(--sand-dim);margin-bottom:6px}
+  .code{font-size:44px;font-weight:900;letter-spacing:10px;text-align:center;color:var(--gold-text);font-family:monospace;direction:ltr}
+  .codein{width:100%;padding:12px;border-radius:12px;border:2px solid var(--stone);background:var(--earth);color:var(--sand);font:inherit;font-size:28px;font-weight:900;text-align:center;letter-spacing:8px;text-transform:uppercase;direction:ltr}
+  .status{font-size:13px;color:var(--sand-dim);text-align:center;margin-top:6px}
+  .status.ok{color:var(--teamA);font-weight:700} .status.bad{color:var(--t500);font-weight:700}
+  .roombar{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--sand-dim);margin-bottom:8px}
+  .roombar b{font-family:monospace;letter-spacing:4px;color:var(--gold-text);direction:ltr;display:inline-block}
+  /* شاشة اللاعبين */
+  #s-player{max-width:none}
+  .pwrap{max-width:560px;margin:0 auto;width:100%}
+  .pcat{font-size:13px;color:var(--gold-text)}
+  .pq{font-size:24px;font-weight:900;line-height:1.4;margin:6px 0 14px}
+  .pwait{text-align:center;color:var(--sand-dim);font-size:18px;padding:40px 0}
+  .plifes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+  .plifes .lgroup .life{pointer-events:none}
+  @media (min-width:700px){
+    .pwrap{max-width:1100px}
+    #s-player .team .s{font-size:56px} #s-player .team .n{font-size:18px}
+    .pq{font-size:38px} .pcat{font-size:18px}
+    #s-player .grid{grid-template-columns:repeat(3,1fr);gap:14px}
+    #s-player .tile{height:150px} #s-player .tile .pts{font-size:54px} #s-player .tile .lvl{font-size:16px} #s-player .tile .ans .t{font-size:26px}
+    #s-player .clock{padding:14px 20px} #s-player .clock .total b{font-size:34px} #s-player .turn .who{font-size:22px}
+    #s-player .cells{gap:10px} #s-player .cell{height:64px;font-size:26px} #s-player .brow .bn{font-size:20px}
+    #s-player .life{font-size:15px;padding:12px 4px}
+    .pwait{font-size:26px}
+  }
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -207,13 +260,34 @@
     <h1>انقشها</h1>
     <p>ست إجابات مدفونة… كل وحدة لها سعر</p>
   </div>
+  <div class="seg" id="modeSeg">
+    <button class="on" onclick="setMode('solo')">📱 جهاز واحد</button>
+    <button onclick="setMode('host')">🎛 جهاز الحكم</button>
+    <button onclick="setMode('player')">📺 شاشة اللاعبين</button>
+  </div>
+  <div class="netbox" id="joinBox">
+    <div class="lbl">اكتب رمز الغرفة اللي على جهاز الحكم</div>
+    <input class="codein" id="joinCode" maxlength="4" placeholder="ABCD" autocomplete="off" autocapitalize="characters">
+    <div class="seg" style="grid-template-columns:1fr 1fr;margin-top:10px"><button class="on" id="jm-peer" onclick="setMethod('peer')">ربط مباشر</button><button id="jm-fb" onclick="setMethod('fb')">Firebase</button></div>
+    <button class="primary" onclick="joinRoom()">اتصل بالغرفة</button>
+    <div class="status" id="joinStatus"></div>
+  </div>
+  <div class="netbox" id="hostBox">
+    <div class="lbl">طريقة الربط</div>
+    <div class="seg" style="grid-template-columns:1fr 1fr"><button class="on" id="hm-peer" onclick="setMethod('peer')">ربط مباشر</button><button id="hm-fb" onclick="setMethod('fb')">Firebase</button></div>
+    <div class="lbl">رمز الغرفة — اكتبه في شاشة اللاعبين</div>
+    <div class="code" id="roomCode">----</div>
+    <div class="status" id="hostStatus">بعد ما تضغط «اختاروا الفئات» تفتح الغرفة</div>
+  </div>
+  <div id="teamFields">
   <div class="field a"><label>اسم الفريق الأول</label><input id="nameA" maxlength="18" autocomplete="off"></div>
   <div class="field b"><label>اسم الفريق الثاني</label><input id="nameB" maxlength="18" autocomplete="off"></div>
-  <button class="primary" onclick="goCats()">اختاروا الفئات</button>
+  </div>
+  <button class="primary" id="btnGo" onclick="goCats()">اختاروا الفئات</button>
   <button class="ghost" onclick="$('rules').classList.toggle('on')">قوانين اللعبة ووسائل المساعدة</button>
   <div class="rules" id="rules">
     <div class="hd">طريقة اللعب</div>
-    كل سؤال فيه ٦ إجابات مدفونة بقيم ١٠٠، ٢٠٠، ٣٠٠، ٤٠٠، ٥٠٠، ٦٠٠ — الأسهل أقل نقاط والأصعب أكثر. الفريق اللي يقول الإجابة أول يأخذ نقاطها. الحكم بس يشوف الإجابات من «قائمة الحكم».
+    كل سؤال فيه ٦ إجابات مدفونة بقيم ١٠٠، ٢٠٠، ٣٠٠، ٤٠٠، ٥٠٠، ٦٠٠ — الأسهل أقل نقاط والأصعب أكثر. الفريق اللي يقول الإجابة أول يأخذ نقاطها. الحكم بس يشوف الإجابات من «قائمة الحكم».<br><b>⏱ الوقت</b>لكل سؤال ٣ دقايق تبدأ لما يضغط الحكم «ابدأ». الدور يتناوب بين الفريقين: كل فريق عنده ٧ ثواني يجاوب فيها، إذا ما جاوب ينتقل الدور تلقائياً للفريق الثاني، وإذا جاوب (صح أو غلط) ينتقل الدور بعد. الفريق اللي دوره يطلع اسمه ملوّن فوق مع العد التنازلي. كل سؤال جديد يبدأ فيه الفريق اللي ما بدأ السؤال اللي قبله. إذا خلصت الـ٣ دقايق يوقف الجواب.
     <div class="hd" style="margin-top:12px">وسائل المساعدة</div>
     كل فريق عنده ٣ وسائل، وكل وسيلة تُستخدم مرة وحدة فقط طول اللعبة.
     <b>🔤 الحرف الأول</b>
@@ -242,6 +316,7 @@
 
 <!-- ===== اللوحة ===== -->
 <section class="screen" id="s-board">
+  <div class="roombar" id="rbBoard" style="display:none"><span>غرفة <b class="rbCode"></b></span><span class="rbConn"></span></div>
   <div class="scores">
     <div class="team a" id="bA"><div class="n"></div><div class="s">0</div></div>
     <div class="team b" id="bB"><div class="n"></div><div class="s">0</div></div>
@@ -252,9 +327,10 @@
 
 <!-- ===== شاشة اللعب ===== -->
 <section class="screen" id="s-play">
+  <div class="roombar" id="rbPlay" style="display:none"><span>غرفة <b class="rbCode"></b></span><span class="rbConn"></span></div>
   <div class="scores">
-    <div class="team a" id="tA"><div class="n"></div><div class="s">0</div></div>
-    <div class="team b" id="tB"><div class="n"></div><div class="s">0</div></div>
+    <div class="team a" id="tA" onclick="setTurn('A',true)"><div class="n"></div><div class="s">0</div></div>
+    <div class="team b" id="tB" onclick="setTurn('B',true)"><div class="n"></div><div class="s">0</div></div>
   </div>
   <div class="lifes">
     <div class="lgroup a">
@@ -271,9 +347,14 @@
   <div class="qbar"><span id="qnum"></span><button class="hostbtn" id="hostbtn" onclick="toggleHost()">👁 قائمة الحكم</button></div>
   <div class="tag" id="qcat"></div>
   <div class="q" id="qtext"></div>
-  <div class="timer" id="timer">
-    <div class="ring"><svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="28"/><circle class="fg" id="tfg" cx="32" cy="32" r="28"/></svg><div class="num" id="tnum">60</div></div>
-    <div class="lbl">ثانية للإجابة</div>
+  <div class="clock" id="clock">
+    <div class="total">وقت السؤال<b id="tTotal">3:00</b></div>
+    <button class="go" id="goBtn" onclick="startClock()">▶ ابدأ</button>
+    <div class="turn" id="turnBox" style="display:none">
+      <div class="who" id="turnWho"></div>
+      <div class="ring"><svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="24"/><circle class="fg" id="tfg" cx="28" cy="28" r="24"/></svg><div class="num" id="tnum">7</div></div>
+      <button class="pause" id="pauseBtn" onclick="togglePause()">إيقاف</button>
+    </div>
   </div>
   <div class="timeup" id="timeup">⏱ انتهى الوقت — ما فيه إجابات بعد</div>
   <div class="host" id="host">
@@ -287,6 +368,12 @@
     <button class="primary" id="btnNext" onclick="backBoard()">رجوع للوحة</button>
   </div>
 </section>
+
+<!-- ===== شاشة اللاعبين ===== -->
+<section class="screen" id="s-player"><div class="pwrap">
+  <div class="roombar"><span>شاشة اللاعبين · غرفة <b id="pCode"></b></span><span id="pStatus"></span></div>
+  <div id="pBody"><div class="pwait">بانتظار جهاز الحكم…</div></div>
+</div></section>
 
 <!-- ===== شاشة النهاية ===== -->
 <section class="screen" id="s-end">
@@ -317,7 +404,13 @@
   <div class="box"><h3 id="lTitle"></h3><p id="lBody"></p><div id="lContent"></div><button class="ghost" onclick="closeL()">إغلاق</button></div>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script>
+// ===== إعدادات Firebase (اختياري) — الصق مفاتيح مشروعك هنا =====
+const FIREBASE_CONFIG = null; // مثال: {apiKey:"...", authDomain:"...", databaseURL:"...", projectId:"..."}
+
 // ===== بنك الفئات: كل فئة ٦ أسئلة، كل سؤال ٦ إجابات مرتبة من الأسهل (100) للأصعب (600) =====
 const CATS = [
  {n:"كرة القدم العالمية",spare:["مدربون فازوا بكأس العالم",["ديدييه ديشان","ليونيل سكالوني","فيسنتي ديل بوسكي","يواكيم لوف","مارسيلو ليبي","لويس دي لا فوينتي"]],ic:"⚽",q:[
@@ -1030,13 +1123,15 @@ function remaining(cat){ return cat.q.length-usedSet(cat.n).size; }
 function markUsed(name,idxs){ USED[name]=[...new Set([...(USED[name]||[]),...idxs])]; saveUsed(); }
 function resetUsed(){ USED={}; saveUsed(); if($('cats').children.length) renderCats(); $('resetmsg').textContent='تم تصفير الأسئلة — كل الفئات رجعت كاملة.'; }
 loadUsed();
+document.addEventListener('DOMContentLoaded',()=>{ $('joinCode').addEventListener('keydown',e=>{ if(e.key==='Enter') joinRoom(); }); });
 
 const PTS = [100,200,300,400,500,600];
 const LVL = {100:"سهل",200:"سهل",300:"متوسط",400:"متوسط",500:"صعب",600:"صعب"};
 
 let names={A:"",B:""}, score={A:0,B:0}, picked=[], game=[], done={}, curCat=0, curQ=0, cur=null, history=[];
 let lifes={}, swapped={};
-let tInt=null, tLeft=60; const TIME=60, CIRC=2*Math.PI*28;
+let tInt=null, tLeft=180, turnLeft=7, turnTeam='A', startTeam='A', running=false, paused=false;
+const TIME=180, TURN=7, CIRC=2*Math.PI*24;
 const $ = id => document.getElementById(id);
 const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
 function toggleTheme(){ const d=document.body.classList.toggle('dark'); $('themebtn').textContent=d?'☀️':'🌙'; }
@@ -1047,6 +1142,7 @@ function goCats(){
   names.A=$('nameA').value.trim()||"الفريق الأزرق";
   names.B=$('nameB').value.trim()||"الفريق الأحمر";
   picked=[]; renderCats(); show('s-cats');
+  if(MODE==='host') hostOpen();
 }
 function renderCats(){
   const c=$('cats'); c.innerHTML='';
@@ -1117,35 +1213,58 @@ function loadQ(ci,qi){
     r.onclick=()=>openSheet(i,b,ans[i]);
     hl.appendChild(r);
   });
-  syncHost(); syncLifes(); show('s-play');
+  syncHost(); syncLifes(); show('s-play'); setupClock();
 }
-function startTimer(){
-  clearInterval(tInt); tLeft=TIME;
-  $('timeup').classList.remove('on'); $('timer').style.display='';
+function fmt(n){ return Math.floor(n/60)+':'+String(n%60).padStart(2,'0'); }
+function setupClock(){
+  clearInterval(tInt); running=false; paused=false; tLeft=TIME; turnLeft=TURN;
+  turnTeam=startTeam; startTeam=opp(startTeam);          // كل سؤال يبدأ الفريق الثاني
+  $('timeup').classList.remove('on'); $('clock').style.display='';
   ['grid','hostlist'].forEach(id=>$(id).classList.remove('locked'));
   document.querySelector('.lifes').classList.remove('locked');
-  $('tfg').style.strokeDasharray=CIRC; drawTimer();
-  tInt=setInterval(()=>{ tLeft--; drawTimer(); if(tLeft<=0){ clearInterval(tInt); timeUp(); } },1000);
+  $('goBtn').style.display=''; $('turnBox').style.display='none';
+  $('tfg').style.strokeDasharray=CIRC; drawClock();
 }
-function drawTimer(){
-  $('tnum').textContent=tLeft;
-  $('tfg').style.strokeDashoffset=CIRC*(1-tLeft/TIME);
-  $('timer').classList.toggle('warn', tLeft<=10);
+function startClock(){
+  running=true; paused=false;
+  $('goBtn').style.display='none'; $('turnBox').style.display='';
+  drawClock();
+  clearInterval(tInt);
+  tInt=setInterval(()=>{
+    if(paused) return;
+    tLeft--; turnLeft--;
+    if(turnLeft<=0){ switchTurn(); tick(); }
+    drawClock();
+    if(tLeft<=0){ clearInterval(tInt); timeUp(); }
+  },1000);
+}
+function togglePause(){ paused=!paused; $('pauseBtn').textContent=paused?'استمرار':'إيقاف'; }
+function setTurn(t,manual){ turnTeam=t; turnLeft=TURN; drawClock(); }
+function switchTurn(){ turnTeam=opp(turnTeam); turnLeft=TURN; }
+function drawClock(){
+  $('tTotal').textContent=fmt(Math.max(tLeft,0));
+  $('clock').classList.toggle('warn', tLeft<=20);
+  $('clock').classList.remove('A','B'); $('clock').classList.add(turnTeam);
+  $('turnWho').innerHTML=`دور ${names[turnTeam]}<small>${turnLeft} ثواني للإجابة</small>`;
+  $('tnum').textContent=turnLeft;
+  $('tfg').style.strokeDashoffset=CIRC*(1-turnLeft/TURN);
+  $('tA').classList.toggle('active', turnTeam==='A'); $('tB').classList.toggle('active', turnTeam==='B');
 }
 function timeUp(){
-  $('timer').style.display='none'; $('timeup').classList.add('on');
+  running=false; $('clock').style.display='none'; $('timeup').classList.add('on');
   ['grid','hostlist'].forEach(id=>$(id).classList.add('locked'));
   document.querySelector('.lifes').classList.add('locked');
+  $('tA').classList.remove('active'); $('tB').classList.remove('active');
   beep();
 }
-function beep(){
-  try{ const a=new (window.AudioContext||window.webkitAudioContext)(); [0,.25,.5].forEach(t=>{ const o=a.createOscillator(), g=a.createGain(); o.frequency.value=880; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.3,a.currentTime+t); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+t+.2); o.start(a.currentTime+t); o.stop(a.currentTime+t+.2); }); }catch(e){}
-}
+function tone(f,t0,d){ try{ const a=tone.ctx||(tone.ctx=new (window.AudioContext||window.webkitAudioContext)()); const o=a.createOscillator(), g=a.createGain(); o.frequency.value=f; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.25,a.currentTime+t0); g.gain.exponentialRampToValueAtTime(.001,a.currentTime+t0+d); o.start(a.currentTime+t0); o.stop(a.currentTime+t0+d); }catch(e){} }
+function tick(){ tone(660,0,.15); }
+function beep(){ [0,.25,.5].forEach(t=>tone(880,t,.2)); }
 function syncLifes(){
   ['A','B'].forEach(t=>['letter','steal','swap'].forEach(k=>{ $('l'+t+'-'+k).disabled=!lifes[t][k]; }));
 }
-function openL(title,body,html){ $('lTitle').textContent=title; $('lBody').textContent=body; $('lContent').innerHTML=html||''; $('lsheet').classList.add('on'); }
-function closeL(){ $('lsheet').classList.remove('on'); }
+function openL(title,body,html){ paused=true; $('lTitle').textContent=title; $('lBody').textContent=body; $('lContent').innerHTML=html||''; $('lsheet').classList.add('on'); }
+function closeL(){ $('lsheet').classList.remove('on'); if(running) paused=false; }
 function opp(t){ return t==='A'?'B':'A'; }
 
 // 🔤 الحرف الأول
@@ -1195,12 +1314,13 @@ function syncHost(){
 function toggleHost(){ $('host').classList.toggle('on'); $('hostbtn').classList.toggle('on'); }
 
 function openSheet(i,tile,text){
-  cur={i,tile};
+  cur={i,tile}; paused=true;
+  $('shA').classList.toggle('sugg',turnTeam==='A'); $('shB').classList.toggle('sugg',turnTeam==='B');
   $('shAns').textContent=text;
   $('shPts').textContent=`${PTS[i]} نقطة · ${LVL[PTS[i]]}`;
   $('sheet').classList.add('on');
 }
-function closeSheet(){ $('sheet').classList.remove('on'); cur=null; }
+function closeSheet(){ $('sheet').classList.remove('on'); cur=null; if(running) paused=false; }
 function award(team){
   const {i,tile}=cur; closeSheet();
   const p=PTS[i];
@@ -1209,6 +1329,7 @@ function award(team){
   if(team!=='N'){ score[team]+=p; bump(team); }
   history.push({tile,team,p}); $('btnUndo').disabled=false;
   syncHost(); render();
+  if(running){ switchTurn(); drawClock(); }
 }
 function undo(){
   const h=history.pop(); if(!h) return;
@@ -1248,7 +1369,98 @@ function finish(){
   else { const t=score.A>score.B?'A':'B'; $('wlbl').textContent="الفائز"; w.textContent=names[t]; w.className="name "+t.toLowerCase(); }
   show('s-end');
 }
-function resetGame(){ score={A:0,B:0}; done={}; picked=[]; render(); show('s-start'); }
+
+// ================= وضع الجهازين =================
+let MODE='solo', METHOD='peer', ROOM='';
+const NET={peer:null,conns:[],db:null,last:'',timer:null,player:{peer:null,conn:null}};
+function setMode(m){
+  MODE=m; [...$('modeSeg').children].forEach((b,i)=>b.classList.toggle('on',['solo','host','player'][i]===m));
+  $('joinBox').classList.toggle('on',m==='player'); $('hostBox').classList.toggle('on',m==='host');
+  $('teamFields').style.display=m==='player'?'none':''; $('btnGo').style.display=m==='player'?'none':'';
+  if(m==='host'&&!ROOM){ ROOM=makeCode(); $('roomCode').textContent=ROOM; }
+}
+function setMethod(m){
+  if(m==='fb'&&!FIREBASE_CONFIG){ alert('Firebase مو مفعّل بهذي النسخة — استخدم الربط المباشر'); return; }
+  METHOD=m; ['jm','hm'].forEach(x=>{ $(x+'-peer').classList.toggle('on',m==='peer'); $(x+'-fb').classList.toggle('on',m==='fb'); });
+}
+function makeCode(){ const L='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c=''; for(let i=0;i<4;i++) c+=L[Math.floor(Math.random()*L.length)]; return c; }
+function fbdb(){ if(!NET.db){ firebase.initializeApp(FIREBASE_CONFIG); NET.db=firebase.database(); } return NET.db; }
+
+// ---- الحكم: فتح الغرفة وبث الحالة ----
+function hostOpen(){
+  document.querySelectorAll('.rbCode').forEach(e=>e.textContent=ROOM);
+  ['rbBoard','rbPlay'].forEach(id=>$(id).style.display='');
+  if(METHOD==='fb'){ setConn('Firebase متصل'); }
+  else{
+    try{
+      NET.peer=new Peer('anqishha-'+ROOM);
+      NET.peer.on('open',()=>setConn('الغرفة مفتوحة — بانتظار شاشة اللاعبين'));
+      NET.peer.on('connection',c=>{ NET.conns.push(c); c.on('open',()=>{ setConn('شاشة اللاعبين متصلة ✓'); c.send(buildState()); }); c.on('close',()=>{ NET.conns=NET.conns.filter(x=>x!==c); setConn(NET.conns.length?'متصل ✓':'انقطع الاتصال — بانتظار إعادة الاتصال'); }); });
+      NET.peer.on('error',e=>setConn('خطأ بالاتصال: '+e.type));
+    }catch(e){ setConn('تعذّر فتح الغرفة'); }
+  }
+  clearInterval(NET.timer); NET.timer=setInterval(sync,400);
+}
+function setConn(t){ document.querySelectorAll('.rbConn').forEach(e=>e.textContent=t); $('hostStatus').textContent=t; }
+function buildState(){
+  const scr=document.querySelector('.screen.on')?.id||'';
+  const st={v:1,room:ROOM,screen:scr,names,score,lifes,turnTeam,tLeft,turnLeft,running,paused,timeUp:$('timeup').classList.contains('on')};
+  if(game.length) st.board=game.map((c,ci)=>({n:c.n,ic:c.ic,done:c.q.map((_,qi)=>!!done[ci+'-'+qi])}));
+  if(scr==='s-play'){
+    st.q={cat:game[curCat].n,ic:game[curCat].ic,idx:curQ,text:$('qtext').textContent,
+      tiles:[...document.querySelectorAll('#grid .tile')].map(t=>{ const open=t.classList.contains('open'); const by=t.classList.contains('byA')?'A':t.classList.contains('byB')?'B':t.classList.contains('byN')?'N':''; return {p:PTS[t.dataset.i],open,by,text:open?t.querySelector('.t').textContent:'',who:open?t.querySelector('.who').textContent:''}; })};
+  }
+  if(scr==='s-end') st.end={wlbl:$('wlbl').textContent,wname:$('wname').textContent,wcls:$('wname').className};
+  return st;
+}
+function sync(){
+  if(MODE!=='host') return;
+  const st=buildState(), j=JSON.stringify(st); if(j===NET.last) return; NET.last=j;
+  if(METHOD==='fb'){ try{ fbdb().ref('rooms/'+ROOM).set(st); }catch(e){} }
+  else NET.conns.forEach(c=>{ try{ c.open&&c.send(st); }catch(e){} });
+}
+
+// ---- شاشة اللاعبين ----
+function joinRoom(){
+  const code=$('joinCode').value.trim().toUpperCase(); if(code.length!==4){ $('joinStatus').textContent='الرمز ٤ حروف'; return; }
+  ROOM=code; $('pCode').textContent=code; show('s-player'); pStatus('جاري الاتصال…');
+  if(METHOD==='fb'){ fbdb().ref('rooms/'+code).on('value',snap=>{ const st=snap.val(); if(st){ pStatus('متصل ✓',true); renderPlayer(st); } else pStatus('ما فيه غرفة بهذا الرمز',false); }); return; }
+  const connect=()=>{
+    try{
+      if(NET.player.peer) NET.player.peer.destroy();
+      const pr=new Peer(); NET.player.peer=pr;
+      pr.on('open',()=>{ const c=pr.connect('anqishha-'+code,{reliable:true}); NET.player.conn=c;
+        c.on('open',()=>pStatus('متصل ✓',true)); c.on('data',st=>renderPlayer(st));
+        c.on('close',()=>{ pStatus('انقطع الاتصال — إعادة المحاولة…',false); setTimeout(connect,3000); }); });
+      pr.on('error',e=>{ pStatus(e.type==='peer-unavailable'?'ما فيه غرفة بهذا الرمز — تأكد إن الحكم ضغط «اختاروا الفئات»':'خطأ: '+e.type,false); setTimeout(connect,4000); });
+    }catch(e){ pStatus('تعذّر الاتصال',false); }
+  };
+  connect();
+}
+function pStatus(t,ok){ const e=$('pStatus'); e.textContent=t; e.className='status '+(ok===true?'ok':ok===false?'bad':''); }
+function renderPlayer(st){
+  const b=$('pBody'); const n=st.names; const act=t=>st.running&&!st.timeUp&&st.turnTeam===t?' active':'';
+  const scores=`<div class="scores"><div class="team a${act('A')}"><div class="n">${esc(n.A)}</div><div class="s">${st.score.A}</div></div><div class="team b${act('B')}"><div class="n">${esc(n.B)}</div><div class="s">${st.score.B}</div></div></div>`;
+  const lf=t=>`<div class="lgroup ${t.toLowerCase()}">${[['letter','🔤 الحرف الأول'],['steal','🥷 اسرق'],['swap','🔄 بدّل']].map(([k,l])=>`<button class="life" ${st.lifes&&st.lifes[t]&&st.lifes[t][k]?'':'disabled'}>${l}</button>`).join('')}</div>`;
+  const lifes=st.lifes?`<div class="plifes">${lf('A')}${lf('B')}</div>`:'';
+  if(st.screen==='s-play'&&st.q){
+    const q=st.q;
+    const clock = st.timeUp ? `<div class="timeup on">⏱ انتهى الوقت — ما فيه إجابات بعد</div>` :
+      `<div class="clock ${st.turnTeam}${st.tLeft<=20?' warn':''}"><div class="total">وقت السؤال<b>${fmt(Math.max(st.tLeft,0))}</b></div>${st.running?`<div class="turn"><div class="who">دور ${esc(n[st.turnTeam])}<small>${st.paused?'متوقف مؤقتاً':st.turnLeft+' ثواني للإجابة'}</small></div><div class="ring"><svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="24"/><circle class="fg" cx="28" cy="28" r="24" style="stroke-dasharray:${CIRC};stroke-dashoffset:${CIRC*(1-st.turnLeft/TURN)}"/></svg><div class="num">${st.turnLeft}</div></div></div>`:`<div class="turn"><div class="who">بانتظار الحكم يبدأ الوقت</div></div>`}</div>`;
+    const tiles=q.tiles.map(t=>`<div class="tile v${t.p}${t.open?' open by'+t.by:''}"><div class="face"><div class="pts">${t.p}</div><div class="lvl">${LVL[t.p]}</div></div><div class="ans"><div class="t">${esc(t.text)}</div><div class="who">${esc(t.who)}</div></div></div>`).join('');
+    b.innerHTML=`${scores}${lifes}<div class="pcat" style="margin-top:14px">${q.ic} ${esc(q.cat)} · سؤال ${q.idx+1}</div><div class="pq">${esc(q.text)}</div>${clock}<div class="grid">${tiles}</div>`;
+  } else if(st.screen==='s-board'&&st.board){
+    const rows=st.board.map(c=>`<div class="brow"><div class="bn"><span>${c.ic} ${esc(c.n)}</span><small>${c.done.filter(x=>!x).length?`باقي ${c.done.filter(x=>!x).length}`:'خلصت'}</small></div><div class="cells">${c.done.map((d,i)=>`<div class="cell${d?' done':''}">${i+1}</div>`).join('')}</div></div>`).join('');
+    b.innerHTML=`${scores}${lifes}<div class="board" style="margin-top:14px">${rows}</div>`;
+  } else if(st.screen==='s-end'&&st.end){
+    b.innerHTML=`<div class="win"><div class="lbl">${esc(st.end.wlbl)}</div><div class="${st.end.wcls}">${esc(st.end.wname)}</div>${scores}</div>`;
+  } else {
+    b.innerHTML=`<div class="pwait">الحكم يجهّز اللعبة…</div>`;
+  }
+}
+function esc(t){ return String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function resetGame(){ score={A:0,B:0}; done={}; picked=[]; game=[]; render(); NET.last=''; show('s-start'); }
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}</script>
 </body>
